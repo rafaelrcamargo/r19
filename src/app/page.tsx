@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
-import Counter from "./counter";
-import OS from "./os";
+import Counter from "../components/counter";
+import OS from "../components/os";
 
 const Page = () => {
   return (
@@ -18,6 +18,10 @@ const Page = () => {
             <Counter />
           </Suspense>
         </section>
+
+        <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
+          Follow to: <a href="/hey">Hey!</a>
+        </nav>
       </main>
 
       <footer className="mx-4">

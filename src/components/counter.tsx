@@ -5,6 +5,7 @@ import { Toaster, toast } from "sonner";
 
 const Counter = () => {
   const [count, increment] = useReducer((count) => count + 1, 0);
+
   return (
     <>
       <Toaster closeButton />
