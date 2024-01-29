@@ -3,7 +3,7 @@
 import { useReducer } from "react";
 import { Toaster, toast } from "sonner";
 
-const Counter = () => {
+export default () => {
   const [count, increment] = useReducer((count) => count + 1, 0);
 
   return (
@@ -26,4 +26,4 @@ const Counter = () => {
   );
 };
 
-export default Counter;
+export const Dummy = () => <></>;

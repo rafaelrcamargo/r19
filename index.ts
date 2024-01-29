@@ -1,70 +1,112 @@
-import { resolve, parse } from "path";
+import { resolve, relative, parse } from "path";
 import { readdir } from "fs/promises";
 
 import { renderToReadableStream } from "react-server-dom-webpack/server.edge";
 
-const clientManifest: Record<string, unknown> = {};
+/* import RSDWRegister from "react-server-dom-webpack/node-register";
+RSDWRegister(); */
+
+console.log("\nBuilding the pages\n");
+
+await Bun.$`rm -rf ./build/`;
+
+const clientManifest: Record<string, Record<string, unknown>> = {};
 
 const pages = (await readdir(resolve("src/app"), { recursive: true }))
   .filter((file) => file.endsWith("page.tsx"))
   .map((page) => resolve("src/app", page));
 
-await Bun.build({
+const server = await Bun.build({
   target: "bun",
-  external: ["*"],
+  external: ["react", "react-dom", "scheduler"],
   entrypoints: pages,
-  outdir: resolve("build", "app")
+  outdir: resolve("build", "app"),
+  plugins: [
+    {
+      name: "rsc-server",
+      setup(build) {
+        build.onLoad({ filter: /\.(ts|tsx)$/ }, async (args) => {
+          console.log({ args });
+
+          const content = await Bun.file(args.path).text();
+
+          // If there are no directives, we let it be bundled
+          const uses = content.match(/(?:^|\n|;)("use (client|server)";)/);
+          if (!uses) return { contents: content };
+
+          const { exports } = new Bun.Transpiler({ loader: "tsx" }).scan(
+            content
+          );
+
+          if (exports.length === 0) return { contents: content };
+
+          const refs = exports.map((e) => {
+            const path = `/${relative(".", args.path)
+              .replace("src", "build")
+              .replace(".tsx", ".js")
+              .replace(".ts", ".js")}`;
+
+            const key = e === "default" ? parse(path).name + "_" + e : e;
+
+            clientManifest[path] = {};
+            clientManifest[path][e] = {
+              id: resolve(path),
+              chunks: [resolve(path)],
+              async: true,
+              name: e
+            };
+
+            return uses[2] === "server"
+              ? `\n\n${e}.$$typeof = Symbol.for("react.server.reference"); ${e}.$$filepath = "${path}"; ${e}.$$name = "${e}"; ${e}.$$bound = "";`
+              : `${
+                  e === "default"
+                    ? "export default { "
+                    : `export const ${e} = { `
+                }$$typeof: Symbol.for("react.${
+                  uses[2]
+                }.reference"), $$id: "${path}#${e}", $$async: false, filepath: "${path}", name: "${e}" }`;
+          });
+
+          console.log(refs);
+
+          return {
+            contents:
+              uses[2] === "server"
+                ? content + refs.join("\n\n")
+                : refs.join("\n\n"),
+            loader: "tsx"
+          };
+        });
+      }
+    }
+  ]
 });
+
+console.log("Successful build?", server.success, server);
+console.log("\nBuilding the components\n");
 
 const components = (
   await readdir(resolve("src/components"), { recursive: true })
 ).map((file) => resolve("src/components", file));
 
-const { outputs } = await Bun.build({
+const client = await Bun.build({
   target: "bun",
   splitting: true,
-  entrypoints: [resolve("src/_client.tsx"), ...components]
+  entrypoints: [resolve("src/_client.tsx"), ...components],
+  outdir: resolve("build")
 });
 
-await Promise.all(
-  outputs.map(async (out) => {
-    const absolute = resolve("build", out.path);
-    const content = await out.text();
+console.log("Successful build?", client.success);
 
-    const directives = content.match(/(?:^|\n|;)("use (client|server)";)/);
+Bun.write("build/manifest.json", JSON.stringify(clientManifest));
 
-    console.log(directives);
-
-    if (out.kind !== "entry-point" || !directives)
-      return void Bun.write(absolute, content);
-
-    const { exports } = new Bun.Transpiler().scan(content);
-    if (exports.length === 0) return void Bun.write(absolute, content);
-
-    const refs = exports.map((e) => {
-      const name = e === "default" ? parse(out.path).name + "_" + e : e;
-
-      clientManifest[`${absolute}#${name}`] = {
-        id: resolve("/build", out.path),
-        name: e,
-        async: true,
-        chunks: []
-      };
-
-      console.log(directives[2]);
-
-      return `${name}.$$id="${absolute}#${name}";\n${name}.$$typeof=Symbol.for("react.${directives[2]}.reference");`;
-    });
-
-    return void Bun.write(absolute, `${content}\n${refs.join("\n\n")}`);
-  })
-);
-
-console.log("Listening on http://localhost:3000");
+console.log("\nListening on http://localhost:3000\n");
 
 Bun.serve({
+  port: 3001,
   async fetch(req) {
-    const url = new URL(req.url);
+    console.log(new Date().toLocaleTimeString(), "-", req.method, req.url);
+    const url = new URL(req.url); // Parse the URL
 
     if (url.searchParams.has("__RSC")) {
       const props = Object.fromEntries(url.searchParams.entries());

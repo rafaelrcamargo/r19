@@ -175,3 +175,8 @@ dist
 .DS_Store
 
 build/
+
+bun.lockb
+
+types.d.ts
+tailwind.config.ts

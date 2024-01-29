@@ -2,22 +2,21 @@
   "name": "rsc",
   "type": "module",
   "module": "index.ts",
+  "dependencies": {
+    "@types/react-syntax-highlighter": "^15.5.11",
+    "react-syntax-highlighter": "^15.5.0",
+    "sonner": "^1.3.1"
+  },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "nodemon": "^3.0.3",
-    "react": "18.3.0-next-3706edb81-20230308",
-    "react-dom": "18.3.0-next-3706edb81-20230308",
-    "react-server-dom-webpack": "0.0.0-experimental-41b4714f1-20230328"
+    "react": "0.0.0-experimental-a8875eab7-20230310",
+    "react-dom": "0.0.0-experimental-a8875eab7-20230310",
+    "react-server-dom-webpack": "0.0.0-experimental-a8875eab7-20230310"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "@types/react-syntax-highlighter": "^15.5.11",
-    "bright": "^0.8.4",
-    "react-syntax-highlighter": "^15.5.0",
-    "sonner": "^1.3.1"
   }
 }

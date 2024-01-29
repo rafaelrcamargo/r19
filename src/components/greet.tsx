@@ -1,14 +1,27 @@
 "use client";
 
-export const Greeter = ({ greet }: any) => {
+import { useState, useTransition } from "react";
+
+export default ({ action }: any) => {
+  const [isPending, startTransition] = useTransition();
+  const [likeCount, setLikeCount] = useState(0);
+
+  const onClick = () => {
+    console.log("click");
+    // @ts-expect-error - TODO: fix this
+    startTransition(async () => {
+      console.log("transitioning");
+      const currentCount = await action();
+      setLikeCount(currentCount);
+    });
+  };
+
   return (
-    <button
-      onClick={() =>
-        Promise.resolve(greet(String(Math.random()))).then((res) => alert(res))
-      }
-      className="mt-4"
-    >
-      Greet
-    </button>
+    <>
+      <p>Total Likes: {likeCount}</p>
+      <button onClick={onClick} disabled={isPending}>
+        Like
+      </button>
+    </>
   );
 };
