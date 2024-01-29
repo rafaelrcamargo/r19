@@ -1,13 +1,9 @@
-import { resolve, relative, parse } from "path";
+import { resolve, relative } from "path";
 import { readdir } from "fs/promises";
 
 import { renderToReadableStream } from "react-server-dom-webpack/server.edge";
 
-/* import RSDWRegister from "react-server-dom-webpack/node-register";
-RSDWRegister(); */
-
-console.log("\nBuilding the pages\n");
-
+console.log("\n----------------- Building the pages\n");
 await Bun.$`rm -rf ./build/`;
 
 const clientManifest: Record<string, Record<string, unknown>> = {};
@@ -18,8 +14,8 @@ const pages = (await readdir(resolve("src/app"), { recursive: true }))
 
 const server = await Bun.build({
   target: "bun",
-  external: ["react", "react-dom", "scheduler"],
   entrypoints: pages,
+  external: ["react", "react-dom", "scheduler"],
   outdir: resolve("build", "app"),
   plugins: [
     {
@@ -46,8 +42,6 @@ const server = await Bun.build({
               .replace(".tsx", ".js")
               .replace(".ts", ".js")}`;
 
-            const key = e === "default" ? parse(path).name + "_" + e : e;
-
             clientManifest[path] = {};
             clientManifest[path][e] = {
               id: resolve(path),
@@ -57,22 +51,22 @@ const server = await Bun.build({
             };
 
             return uses[2] === "server"
-              ? `\n\n${e}.$$typeof = Symbol.for("react.server.reference"); ${e}.$$filepath = "${path}"; ${e}.$$name = "${e}"; ${e}.$$bound = "";`
-              : `${
+              ? // If it is a server component, we add things in the export
+                `\n\n${e}.$$typeof = Symbol.for("react.server.reference"); ${e}.$$filepath = "${path}"; ${e}.$$name = "${e}"; ${e}.$$bound = "";`
+              : // If it is a client component, we inline only the reference, then it will be fetched  later
+                `${
                   e === "default"
                     ? "export default { "
                     : `export const ${e} = { `
-                }$$typeof: Symbol.for("react.${
-                  uses[2]
-                }.reference"), $$id: "${path}#${e}", $$async: false, filepath: "${path}", name: "${e}" }`;
+                }$$typeof: Symbol.for("react.client.reference"), $$id: "${path}#${e}", $$async: false, filepath: "${path}", name: "${e}" }`;
           });
-
-          console.log(refs);
 
           return {
             contents:
               uses[2] === "server"
-                ? content + refs.join("\n\n")
+                ? // I'm not sure this is right, feel like the code for server functions shouldn't be in the bundle
+                  // But without this I get a "object is not a function" error on the client
+                  content + refs.join("\n\n")
                 : refs.join("\n\n"),
             loader: "tsx"
           };
@@ -83,7 +77,7 @@ const server = await Bun.build({
 });
 
 console.log("Successful build?", server.success, server);
-console.log("\nBuilding the components\n");
+console.log("\n----------------- Building the components\n");
 
 const components = (
   await readdir(resolve("src/components"), { recursive: true })
@@ -97,20 +91,18 @@ const client = await Bun.build({
 });
 
 console.log("Successful build?", client.success);
-
 Bun.write("build/manifest.json", JSON.stringify(clientManifest));
-
-console.log("\nListening on http://localhost:3000\n");
+console.log("\n----------------- Listening on http://localhost:3000\n");
 
 Bun.serve({
   port: 3001,
   async fetch(req) {
     console.log(new Date().toLocaleTimeString(), "-", req.method, req.url);
-    const url = new URL(req.url); // Parse the URL
+    const url = new URL(req.url); // Parse the incoming URL
 
     if (url.searchParams.has("__RSC")) {
       const props = Object.fromEntries(url.searchParams.entries());
-      delete props["__RSC"];
+      delete props["__RSC"]; // Remove __RSC from the props
 
       let rsc; // Create a slot for the resource
 
