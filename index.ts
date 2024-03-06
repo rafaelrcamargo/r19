@@ -95,7 +95,7 @@ Bun.write("build/manifest.json", JSON.stringify(clientManifest));
 console.log("\n----------------- Listening on http://localhost:3000\n");
 
 Bun.serve({
-  port: 3001,
+  port: 3000,
   async fetch(req) {
     console.log(new Date().toLocaleTimeString(), "-", req.method, req.url);
     const url = new URL(req.url); // Parse the incoming URL
