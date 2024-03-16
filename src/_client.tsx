@@ -29,6 +29,10 @@ const search = new URLSearchParams(window.location.search);
 search.set("__RSC", "true");
 url.search = search.toString();
 
+fetch(url).then(async (response) => {
+  console.log(await response.text());
+});
+
 createFromFetch(fetch(url), {
   callServer(id: string, args: unknown[]) {
     console.log("callServer", id, args);
@@ -39,7 +43,8 @@ createFromFetch(fetch(url), {
     });
 
     return createFromFetch(response);
-  }
+  },
+  
 }).then((response: ReactNode) => {
   console.log("From fetch:", response);
   return createRoot(document.getElementById("root")!).render(

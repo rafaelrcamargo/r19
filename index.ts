@@ -23,8 +23,6 @@ const server = await Bun.build({
       name: "rsc-server",
       setup(build) {
         build.onLoad({ filter: /\.(ts|tsx)$/ }, async (args) => {
-          console.log({ args });
-
           const content = await Bun.file(args.path).text();
 
           // If there are no directives, we let it be bundled
