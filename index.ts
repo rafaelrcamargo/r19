@@ -22,17 +22,24 @@ const server = await Bun.build({
       name: "rsc-server",
       setup(build) {
         build.onLoad({ filter: /\.(ts|tsx)$/ }, async (args) => {
-          console.log({ args });
-
           const content = await Bun.file(args.path).text();
 
           // If there are no directives, we let it be bundled
+          console.log(
+            "Scanning",
+            args.path,
+            "for directives",
+            content.includes("use client") || content.includes("use server")
+          );
           const uses = content.match(/(?:^|\n|;)("use (client|server)";)/);
+          console.log("Uses", uses);
           if (!uses) return { contents: content };
 
           const { exports } = new Bun.Transpiler({ loader: "tsx" }).scan(
             content
           );
+
+          console.log("Exports", exports);
 
           if (exports.length === 0) return { contents: content };
 
@@ -41,6 +48,8 @@ const server = await Bun.build({
               .replace("src", "build")
               .replace(".tsx", ".js")
               .replace(".ts", ".js")}`;
+
+            console.log("Path", path);
 
             clientManifest[path] = {};
             clientManifest[path][e] = {
@@ -52,14 +61,14 @@ const server = await Bun.build({
 
             return uses[2] === "server"
               ? // If it is a server component, we add things in the export
-                `\n\n${e}.$$typeof = Symbol.for("react.server.reference"); ${e}.$$filepath = "${path}"; ${e}.$$name = "${e}"; ${e}.$$bound = "";`
+                `\n\n${e}.$$typeof=Symbol.for("react.server.reference");${e}.$$id="${path}#${e}";${e}.$$bound=null;`
               : // If it is a client component, we inline only the reference, then it will be fetched  later
                 `${
-                  e === "default"
-                    ? "export default { "
-                    : `export const ${e} = { `
-                }$$typeof: Symbol.for("react.client.reference"), $$id: "${path}#${e}", $$async: false, filepath: "${path}", name: "${e}" }`;
+                  e === "default" ? "export default {" : `export const ${e} = {`
+                }$$typeof:Symbol.for("react.client.reference"),$$id:"${path}#${e}"}`;
           });
+
+          console.log("Refs", refs);
 
           return {
             contents:
@@ -86,11 +95,12 @@ const components = (
 const client = await Bun.build({
   target: "bun",
   splitting: true,
+  loader: { ".js": "tsx" },
   entrypoints: [resolve("src/_client.tsx"), ...components],
   outdir: resolve("build")
 });
 
-console.log("Successful build?", client.success);
+console.log("Successful build?", client.success, client);
 Bun.write("build/manifest.json", JSON.stringify(clientManifest));
 console.log("\n----------------- Listening on http://localhost:3000\n");
 
@@ -114,6 +124,8 @@ Bun.serve({
         console.error(e);
         rsc = "404 Not found";
       }
+
+      console.log(clientManifest);
 
       return new Response(renderToReadableStream(rsc, clientManifest));
     }
