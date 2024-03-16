@@ -2,6 +2,7 @@ import { StrictMode, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { createFromFetch } from "react-server-dom-webpack/client";
+// import { createFromFetch } from "react-server-dom-esm/client";
 
 const __bun__module_map__ = new Map();
 

@@ -1,6 +1,6 @@
 /* import { Prism } from "react-syntax-highlighter"; */
 
-import { addLike } from "../../components/actions"
+import { addLike } from "../../components/actions";
 import Greet from "../../components/greet";
 
 const Page = async (props: {}) => {

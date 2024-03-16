@@ -2,6 +2,7 @@ import { resolve, relative } from "path";
 import { readdir } from "fs/promises";
 
 import { renderToReadableStream } from "react-server-dom-webpack/server.edge";
+// import { renderToReadableStream } from "react-dom/server";
 
 console.log("\n----------------- Building the pages\n");
 await Bun.$`rm -rf ./build/`;
@@ -27,8 +28,10 @@ const server = await Bun.build({
           const content = await Bun.file(args.path).text();
 
           // If there are no directives, we let it be bundled
-          const uses = content.match(/(?:^|\n|;)("use (client|server)";)/);
-          if (!uses) return { contents: content };
+          const directives = content.match(
+            /(?:^|\n|;)("use (client|server)";)/
+          );
+          if (!directives) return { contents: content };
 
           const { exports } = new Bun.Transpiler({ loader: "tsx" }).scan(
             content
@@ -50,7 +53,7 @@ const server = await Bun.build({
               name: e
             };
 
-            return uses[2] === "server"
+            return directives[2] === "server"
               ? // If it is a server component, we add things in the export
                 `\n\n${e}.$$typeof = Symbol.for("react.server.reference"); ${e}.$$filepath = "${path}"; ${e}.$$name = "${e}"; ${e}.$$bound = "";`
               : // If it is a client component, we inline only the reference, then it will be fetched  later
@@ -63,7 +66,7 @@ const server = await Bun.build({
 
           return {
             contents:
-              uses[2] === "server"
+              directives[2] === "server"
                 ? // I'm not sure this is right, feel like the code for server functions shouldn't be in the bundle
                   // But without this I get a "object is not a function" error on the client
                   content + refs.join("\n\n")
@@ -95,7 +98,7 @@ Bun.write("build/manifest.json", JSON.stringify(clientManifest));
 console.log("\n----------------- Listening on http://localhost:3000\n");
 
 Bun.serve({
-  port: 3001,
+  port: 3000,
   async fetch(req) {
     console.log(new Date().toLocaleTimeString(), "-", req.method, req.url);
     const url = new URL(req.url); // Parse the incoming URL
@@ -115,7 +118,7 @@ Bun.serve({
         rsc = "404 Not found";
       }
 
-      return new Response(renderToReadableStream(rsc, clientManifest));
+      return new Response(renderToReadableStream(rsc, clientManifest) as any);
     }
 
     if (new Bun.Glob("/build/**").match(url.pathname))
