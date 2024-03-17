@@ -1,16 +1,20 @@
-import { resolve, relative } from "path";
-import { readdir } from "fs/promises";
+import { resolve, relative } from "path"
+import { readdir } from "fs/promises"
 
-import { renderToReadableStream } from "react-server-dom-webpack/server.edge";
+import { renderToReadableStream } from "react-server-dom-webpack/server.edge"
+import { renderToPipeableStream } from "react-server-dom-esm/server"
+import * as http from "http"
 
-console.log("\n----------------- Building the pages\n");
-await Bun.$`rm -rf ./build/`;
+import React from "react"
 
-const clientManifest: Record<string, Record<string, unknown>> = {};
+console.log("\n----------------- Building the pages\n")
+await Bun.$`rm -rf ./build/`
+
+const clientManifest: Record<string, Record<string, unknown>> = {}
 
 const pages = (await readdir(resolve("src/app"), { recursive: true }))
   .filter((file) => file.endsWith("page.tsx"))
-  .map((page) => resolve("src/app", page));
+  .map((page) => resolve("src/app", page))
 
 const server = await Bun.build({
   target: "bun",
@@ -20,77 +24,64 @@ const server = await Bun.build({
   plugins: [
     {
       name: "rsc-server",
-      setup(build) {
+      setup (build) {
         build.onLoad({ filter: /\.(ts|tsx)$/ }, async (args) => {
-          const content = await Bun.file(args.path).text();
+          const content = await Bun.file(args.path).text()
 
           // If there are no directives, we let it be bundled
-          console.log(
-            "Scanning",
-            args.path,
-            "for directives",
-            content.includes("use client") || content.includes("use server")
-          );
-          const uses = content.match(/(?:^|\n|;)("use (client|server)";)/);
-          console.log("Uses", uses);
-          if (!uses) return { contents: content };
+          const uses = content.match(/(?:^|\n|;)("use (client|server)";)/)
+          if (!uses) return { contents: content }
 
           const { exports } = new Bun.Transpiler({ loader: "tsx" }).scan(
             content
-          );
+          )
 
-          console.log("Exports", exports);
-
-          if (exports.length === 0) return { contents: content };
+          if (exports.length === 0) return { contents: content }
 
           const refs = exports.map((e) => {
-            const path = `/${relative(".", args.path)
+            const path = `/${ relative(".", args.path)
               .replace("src", "build")
               .replace(".tsx", ".js")
-              .replace(".ts", ".js")}`;
+              .replace(".ts", ".js") }`
 
-            console.log("Path", path);
-
-            clientManifest[path] = {};
+            clientManifest[path] = {}
+            // This is the webpackMap used on the server
             clientManifest[path][e] = {
               id: resolve(path),
               chunks: [resolve(path)],
-              async: true,
+              // async: true,
               name: e
-            };
+            }
 
             return uses[2] === "server"
               ? // If it is a server component, we add things in the export
-                `\n\n${e}.$$typeof=Symbol.for("react.server.reference");${e}.$$id="${path}#${e}";${e}.$$bound=null;`
+              `\n\n${ e }.$$typeof=Symbol.for("react.server.reference");${ e }.$$id="${ path }#${ e }";${ e }.$$bound=null;`
               : // If it is a client component, we inline only the reference, then it will be fetched  later
-                `${
-                  e === "default" ? "export default {" : `export const ${e} = {`
-                }$$typeof:Symbol.for("react.client.reference"),$$id:"${path}#${e}"}`;
-          });
-
-          console.log("Refs", refs);
+              `${ e === "default" ? "export default {" : `export const ${ e } = {`
+              }$$typeof:Symbol.for("react.client.reference"),$$id:"${ path }#${ e }",$$async:true};`
+          })
 
           return {
             contents:
               uses[2] === "server"
                 ? // I'm not sure this is right, feel like the code for server functions shouldn't be in the bundle
-                  // But without this I get a "object is not a function" error on the client
-                  content + refs.join("\n\n")
+                // But without this I get a "object is not a function" error on the client
+                content + refs.join("\n\n")
                 : refs.join("\n\n"),
             loader: "tsx"
-          };
-        });
+          }
+        })
       }
     }
   ]
-});
+})
 
-console.log("Successful build?", server.success, server);
-console.log("\n----------------- Building the components\n");
+console.log("Successful build?", server.success, server)
+console.log("\n----------------- Building the components\n")
 
 const components = (
   await readdir(resolve("src/components"), { recursive: true })
-).map((file) => resolve("src/components", file));
+).map((file) => resolve("src/components", file))
 
 const client = await Bun.build({
   target: "bun",
@@ -98,47 +89,55 @@ const client = await Bun.build({
   loader: { ".js": "tsx" },
   entrypoints: [resolve("src/_client.tsx"), ...components],
   outdir: resolve("build")
-});
+})
 
-console.log("Successful build?", client.success, client);
-Bun.write("build/manifest.json", JSON.stringify(clientManifest));
-console.log("\n----------------- Listening on http://localhost:3000\n");
+console.log("Successful build?", client.success, client)
+Bun.write("build/manifest.json", JSON.stringify(clientManifest))
+console.log("\n----------------- Listening on http://localhost:3000\n")
 
 Bun.serve({
   port: 3000,
-  async fetch(req) {
-    console.log(new Date().toLocaleTimeString(), "-", req.method, req.url);
-    const url = new URL(req.url); // Parse the incoming URL
+  async fetch (req) {
+    console.log(new Date().toLocaleTimeString(), "-", req.method, req.url)
+    const url = new URL(req.url) // Parse the incoming URL
 
     if (url.searchParams.has("__RSC")) {
-      const props = Object.fromEntries(url.searchParams.entries());
-      delete props["__RSC"]; // Remove __RSC from the props
+      const props = Object.fromEntries(url.searchParams.entries())
+      delete props["__RSC"] // Remove __RSC from the props
 
-      let rsc; // Create a slot for the resource
+      let rsc // Create a slot for the resource
 
       try {
         rsc = await (
-          await import(resolve("build/app", `.${url.pathname}/page.js`))
-        ).default(props);
+          await import(resolve("build/app", `.${ url.pathname }/page.js`))
+        ).default(props)
       } catch (e) {
-        console.error(e);
-        rsc = "404 Not found";
+        console.error(e)
+        rsc = "404 Not found"
       }
 
-      console.log(clientManifest);
+      console.log(clientManifest)
 
-      return new Response(renderToReadableStream(rsc, clientManifest));
+      return new Response(renderToReadableStream(rsc, clientManifest))
     }
 
     if (new Bun.Glob("/build/**").match(url.pathname))
-      return new Response(Bun.file(`.${url.pathname}`));
+      return new Response(Bun.file(`.${ url.pathname }`))
 
-    if (new Bun.Glob("/*").match(url.pathname))
+    if (new Bun.Glob("/*").match(url.pathname)) {
+      try {
+        const { pipe } = renderToPipeableStream(React.createElement((await import("./build/app/page.js")).default), "/build/")
+        pipe(new http.ServerResponse({} as any))
+      } catch (e) {
+        console.error(e)
+      }
+
       return new Response(
         `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"></script></head><body><div id="root"></div><script type="module" src="/build/_client.js"></script></body></html>`,
         { headers: { "Content-Type": "text/html" } }
-      );
+      )
+    }
 
-    return new Response("Not found", { status: 404 });
+    return new Response("Not found", { status: 404 })
   }
-});
+})

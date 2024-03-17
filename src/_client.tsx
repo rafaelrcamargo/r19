@@ -8,8 +8,6 @@ import {
   encodeReply
 } from "react-server-dom-esm/client.browser";
 
-console.log("Client");
-
 /* // @ts-expect-error - we just use webpack's function names to avoid forking react
 window.__webpack_chunk_load__ = async (moduleId, ...args) => import(moduleId);
 // @ts-expect-error - Hack to map webpack resolution to native ESM
@@ -17,28 +15,24 @@ window.__webpack_require__ = async (id) => import(id); */
 
 const moduleBaseURL = "/build/";
 
-let updateRoot: any;
+let updateRoot: React.Dispatch<React.SetStateAction<unknown>>;
 const callServer = async (id: any, args: any): Promise<any> => {
   console.log("callServer", id, args);
 
-  const response = fetch(`/?__RSA=true`, {
-    method: "POST",
-    body: await encodeReply(args)
-  });
-
-  console.log("response", response);
-
-  const fromFetch = await createFromFetch(response, {
-    callServer,
-    moduleBaseURL
-  });
+  const fromFetch = await createFromFetch(
+    fetch(`/?__RSA=true`, {
+      method: "POST",
+      body: await encodeReply(args)
+    }),
+    {
+      callServer,
+      moduleBaseURL
+    }
+  );
 
   console.log("returnValue", fromFetch);
 
-  startTransition(() => {
-    updateRoot(fromFetch.root);
-  });
-
+  startTransition(() => updateRoot(fromFetch.root));
   return fromFetch.returnValue;
 };
 
