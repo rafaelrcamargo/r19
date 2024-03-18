@@ -1,20 +1,14 @@
-"use client";
+"use client"
 
-import { useState, useTransition } from "react";
+import { useState, useTransition } from "react"
 
 export default ({ action }: any) => {
-  const [isPending, startTransition] = useTransition();
-  const [likeCount, setLikeCount] = useState(0);
+  const [isPending, startTransition] = useTransition()
+  const [likeCount, setLikeCount] = useState(0)
 
-  const onClick = () => {
-    console.log("click");
-    // @ts-expect-error - TODO: fix this
-    startTransition(async () => {
-      console.log("transitioning");
-      const currentCount = await action();
-      setLikeCount(currentCount);
-    });
-  };
+  const onClick = () =>
+    // @ts-expect-error - async functions should be valid
+    startTransition(async () => setLikeCount(await action()))
 
   return (
     <>
@@ -23,5 +17,5 @@ export default ({ action }: any) => {
         Like
       </button>
     </>
-  );
-};
+  )
+}

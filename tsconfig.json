@@ -1,22 +1,19 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
     "lib": ["ESNext", "DOM"],
-    "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
-    "jsx": "react-jsx",
-    "allowJs": true,
-
-    /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
     "noEmit": true,
-
-    /* Linting */
+    "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "target": "ESNext",
+    "typeRoots": ["./types", "./node_modules/@types", "./node_modules/bun-types"],
+    "verbatimModuleSyntax": true
   }
 }

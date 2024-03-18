@@ -1,21 +1,5 @@
-# Dependency directories
-node_modules/
-
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-
-# Finder (MacOS) folder config
 .DS_Store
-
-# RSC output
+node_modules/
 build/
-
-# Bun lock
-bun.lockb
-
-# Not sure this is needed
-types.d.ts
+# LSP Stuff
+tailwind.config.ts

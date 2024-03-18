@@ -1,7 +1,7 @@
-import { Suspense } from "react";
+import { Suspense } from "react"
 
-import Counter from "../components/counter";
-import OS from "../components/os";
+import Counter from "../components/counter"
+import OS from "../components/os"
 
 const Page = () => {
   return (
@@ -27,16 +27,12 @@ const Page = () => {
       <footer className="mx-4">
         <h2>Caption:</h2>
 
-        <small className="text-red-400">
-          * Server components = No JS, rendered on the server
-        </small>
+        <small className="text-red-400">* Server components = No JS, rendered on the server</small>
         <br />
-        <small className="text-blue-400">
-          * Client components = JS, rendered on the client
-        </small>
+        <small className="text-blue-400">* Client components = JS, rendered on the client</small>
       </footer>
     </>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page

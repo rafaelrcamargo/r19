@@ -2,19 +2,25 @@
   "name": "rsc",
   "type": "module",
   "module": "index.ts",
+  "scripts": {
+    "format": "prettier --ignore-unknown --write . --ignore-path .gitignore",
+    "prestart": "cp -r ../react/build/oss-experimental/* ./node_modules/"
+  },
   "dependencies": {
-    "@types/react-syntax-highlighter": "^15.5.11",
+    "express": "^4.18.3",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.5",
     "react-syntax-highlighter": "^15.5.0",
     "sonner": "^1.4.3"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "nodemon": "^3.1.0",
-    "react": "experimental",
-    "react-dom": "experimental",
-    "react-server-dom-webpack": "experimental"
+    "@types/react-syntax-highlighter": "^15.5.11"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
