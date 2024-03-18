@@ -1,9 +1,9 @@
-"use server";
+"use server"
 
-let likeCount = 0;
+let likeCount = 0
 export async function addLike() {
-  console.log("addLike", likeCount);
+  console.log("addLike", likeCount)
 
-  likeCount++;
-  return likeCount;
+  likeCount++
+  return likeCount
 }

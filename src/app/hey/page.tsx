@@ -1,7 +1,6 @@
 /* import { Prism } from "react-syntax-highlighter"; */
-
 import { addLike } from "../../components/actions"
-import Greet from "../../components/greet";
+import Greet from "../../components/greet"
 
 const Page = async (props: {}) => {
   return (
@@ -20,7 +19,7 @@ const Page = async (props: {}) => {
         </nav>
       </main>
     </>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page
