@@ -1,53 +1,37 @@
-import { StrictMode, type ReactNode } from "react";
-import { createRoot } from "react-dom/client";
+import React, { useState, startTransition, use } from "react"
+import { createRoot } from "react-dom/client"
 
-import { createFromFetch } from "react-server-dom-webpack/client";
-// import { createFromFetch } from "react-server-dom-esm/client";
+import { createFromFetch, encodeReply } from "react-server-dom-esm/client.browser"
 
-const __bun__module_map__ = new Map();
+const moduleBaseURL = "/build/"
 
-// @ts-expect-error - we just use webpack's function names to avoid forking react
-window.__webpack_chunk_load__ = async function (moduleId, ...args) {
-  console.log("chunk load", moduleId, args);
-  const mod = await import(moduleId);
-  __bun__module_map__.set(moduleId, mod);
-  return mod;
-};
+let updateRoot: React.Dispatch<any>
+const callServer = async (id: string, args: unknown[]): Promise<unknown> => {
+  const fromFetch = await createFromFetch(
+    fetch(`/?__RSA=true`, {
+      method: "POST",
+      headers: { "rsa-origin": window.location.pathname, "rsa-reference": id },
+      body: await encodeReply(args)
+    }),
+    { callServer, moduleBaseURL }
+  )
 
-// @ts-expect-error - hack to map webpack resolution to bun
-window.__webpack_require__ = function (moduleId, ...args) {
-  // TODO: handle non-default exports
-  console.log("require", moduleId, args);
-  return __bun__module_map__.get(moduleId);
-};
+  startTransition(() => updateRoot(fromFetch.root))
+  return fromFetch.returnValue
+}
 
-/* // @ts-expect-error - Hack to map webpack resolution to native ESM
-window.__webpack_require__ = async (id) => import(id); */
+const url = new URL(window.location.href)
+const search = new URLSearchParams(window.location.search)
+search.set("__RSC", "true")
+url.search = search.toString()
 
-const url = new URL(window.location.href);
-const search = new URLSearchParams(window.location.search);
-search.set("__RSC", "true");
-url.search = search.toString();
+const data = createFromFetch(fetch(url), { callServer, moduleBaseURL })
 
-fetch(url).then(async (response) => {
-  console.log(await response.text());
-});
+function Shell({ data }: any) {
+  const [root, setRoot] = useState(use(data))
+  updateRoot = setRoot
+  return root
+}
 
-createFromFetch(fetch(url), {
-  callServer(id: string, args: unknown[]) {
-    console.log("callServer", id, args);
-
-    const response = fetch(`/api/${id}`, {
-      body: JSON.stringify(args),
-      method: "POST"
-    });
-
-    return createFromFetch(response);
-  },
-  
-}).then((response: ReactNode) => {
-  console.log("From fetch:", response);
-  return createRoot(document.getElementById("root")!).render(
-    <StrictMode> {response}</StrictMode>
-  );
-});
+// hydrateRoot(document.getElementById("root")!, createElement(Shell, { data }));
+createRoot(document.getElementById("root")!).render(<Shell data={data} />)
