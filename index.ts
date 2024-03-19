@@ -3,6 +3,8 @@ import { readdir } from "fs/promises"
 
 import React, { createElement, type ReactElement } from "react"
 import { renderToPipeableStream, decodeReply } from "react-server-dom-esm/server"
+import { createFromNodeStream } from "react-server-dom-esm/client.node"
+import { renderToPipeableStream as DOM_renderToPipeableStream } from "react-dom/server.node"
 
 import express from "express"
 import type { Response } from "express-serve-static-core"
@@ -75,6 +77,8 @@ const app = express()
 app.use(morgan("tiny") as any)
 app.use("/build", express.static("build"))
 
+import http from "http"
+
 app.get("/*", async (req, res) => {
   const { search } = new URL(req.url, `http://${req.headers.host}`)
   if (search.includes("__RSC")) {
@@ -89,10 +93,17 @@ app.get("/*", async (req, res) => {
       rsc = "404 Not found"
     }
     renderToPipeableStream(rsc, moduleBasePath).pipe(res)
-  } else
-    res.send(
+  } else {
+    http.get("http://localhost:3000/?__RSC=true", rsc => {
+      const vDOM = createFromNodeStream(rsc, resolve("build/") + "/", resolve("/build/"))
+      const htmlStream = DOM_renderToPipeableStream(vDOM)
+      htmlStream.pipe(res)
+    })
+
+    /* res.send(
       `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"></script></head><body><div id="root"></div><script type="module" src="/build/_client.js"></script></body></html>`
-    )
+    ) */
+  }
 })
 
 app.post("/*", bodyParser.text(), async (req, res) => {
