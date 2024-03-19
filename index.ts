@@ -13,7 +13,7 @@ import type { Response } from "express-serve-static-core"
 import bodyParser from "body-parser"
 import morgan from "morgan"
 
-const moduleBasePath = "/build/"
+const moduleBaseURL = "/build/"
 
 console.log("\n----------------- Building the pages\n")
 await Bun.$`rm -rf ./build/`
@@ -67,7 +67,7 @@ const components = (await readdir(resolve("src/components"), { recursive: true }
 const client = await Bun.build({
   target: "bun",
   splitting: true,
-  entrypoints: [resolve("src/_client.tsx"), ...components],
+  entrypoints: [resolve("src/_client.tsx"), resolve("src/_layout.tsx"), ...components],
   outdir: resolve("build")
   // TODO: Add the $$ props to server and client components to be able to validate when needed
 })
@@ -94,12 +94,20 @@ app.get("/*", async (req, res) => {
       console.error(e)
       rsc = "404 Not found"
     }
-    renderToPipeableStream(rsc, moduleBasePath).pipe(res)
+    renderToPipeableStream(rsc, moduleBaseURL).pipe(res)
   } else {
-    http.get("http://localhost:3000/?__RSC=true", rsc => {
-      const vDOM = createFromNodeStream(rsc, resolve("build/") + "/", resolve("/build/"))
-      const htmlStream = DOM_renderToPipeableStream(vDOM)
-      htmlStream.pipe(res)
+    http.get("http://localhost:3000/?__RSC=true", async rsc => {
+      /* const vDOM = createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL) */
+
+      let root: any
+      let Root = () => {
+        if (root) return React.use(root)
+        return React.use((root = createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL)))
+      }
+
+      res.set("Content-type", "text/html")
+      const Layout = (await import(resolve("build/_layout"))).default
+      DOM_renderToPipeableStream(createElement(Layout, { children: createElement(Root) })).pipe(res)
     })
 
     /* res.send(
@@ -121,7 +129,7 @@ app.post("/*", bodyParser.text(), async (req, res) => {
     /* if (action.$$typeof !== Symbol.for("react.server.reference"))
     throw new Error("Invalid action"); */
 
-    const args = await decodeReply(req.body, moduleBasePath)
+    const args = await decodeReply(req.body, moduleBaseURL)
     const result = action.apply(null, args)
 
     try {
@@ -143,5 +151,5 @@ app.listen(3000)
 async function renderApp(res: Response, returnValue: unknown, root: ReactElement) {
   // For client-invoked server actions we refresh the tree and return a return value.
   const payload = returnValue ? { returnValue, root } : root
-  renderToPipeableStream(payload, moduleBasePath).pipe(res)
+  renderToPipeableStream(payload, moduleBaseURL).pipe(res)
 }

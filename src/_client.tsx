@@ -1,5 +1,5 @@
-import React, { useState, startTransition, use } from "react"
-import { createRoot } from "react-dom/client"
+import React, { useState, startTransition, use, createElement } from "react"
+import { createRoot, hydrateRoot } from "react-dom/client"
 
 import { createFromFetch, encodeReply } from "react-server-dom-esm/client.browser"
 
@@ -33,5 +33,5 @@ function Shell({ data }: any) {
   return root
 }
 
-// hydrateRoot(document.getElementById("root")!, createElement(Shell, { data }));
-createRoot(document.getElementById("root")!).render(<Shell data={data} />)
+hydrateRoot(document.getElementById("root")!, createElement(Shell, { data }));
+// createRoot(document.getElementById("root")!).render(<Shell data={data} />)
