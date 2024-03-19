@@ -3,6 +3,8 @@ import { readdir } from "fs/promises"
 
 import React, { createElement, type ReactElement } from "react"
 import { renderToPipeableStream, decodeReply } from "react-server-dom-esm/server"
+
+// SSR
 import { createFromNodeStream } from "react-server-dom-esm/client.node"
 import { renderToPipeableStream as DOM_renderToPipeableStream } from "react-dom/server.node"
 

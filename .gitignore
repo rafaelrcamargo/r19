@@ -1,6 +1,10 @@
 .DS_Store
-node_modules/
-!node_modules/react-server-dom-esm/*
+
+!node_modules/
+node_modules/*
+!node_modules/react-server-dom-esm/
+!node_modules/react-dom/
+
 build/
 # LSP Stuff
 tailwind.config.ts
