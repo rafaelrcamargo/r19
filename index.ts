@@ -96,9 +96,8 @@ app.get("/*", async (req, res) => {
     }
     renderToPipeableStream(rsc, moduleBaseURL).pipe(res)
   } else {
-    http.get("http://localhost:3000/?__RSC=true", async rsc => {
-      /* const vDOM = createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL) */
-
+    // Need to get the rest of the search params on this request
+    http.get(`http://localhost:3000/${req.path}?__RSC=true`, async rsc => {
       let root: any
       let Root = () => {
         if (root) return React.use(root)
@@ -109,10 +108,6 @@ app.get("/*", async (req, res) => {
       const Layout = (await import(resolve("build/_layout"))).default
       DOM_renderToPipeableStream(createElement(Layout, { children: createElement(Root) })).pipe(res)
     })
-
-    /* res.send(
-      `<!DOCTYPE html><html><head><script src="https://cdn.tailwindcss.com"></script></head><body><div id="root"></div><script type="module" src="/build/_client.js"></script></body></html>`
-    ) */
   }
 })
 

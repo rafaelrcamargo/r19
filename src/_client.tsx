@@ -1,11 +1,10 @@
-import React, { useState, startTransition, use, createElement } from "react"
-import { createRoot, hydrateRoot } from "react-dom/client"
-
 import { createFromFetch, encodeReply } from "react-server-dom-esm/client.browser"
+import { useState, startTransition, use, createElement, type Dispatch } from "react"
+import { hydrateRoot } from "react-dom/client"
 
 const moduleBaseURL = "/build/"
 
-let updateRoot: React.Dispatch<any>
+let updateRoot: Dispatch<any>
 const callServer = async (id: string, args: unknown[]): Promise<unknown> => {
   const fromFetch = await createFromFetch(
     fetch(`/?__RSA=true`, {
@@ -27,11 +26,10 @@ url.search = search.toString()
 
 const data = createFromFetch(fetch(url), { callServer, moduleBaseURL })
 
-function Shell({ data }: any) {
+const Shell = ({ data }: any) => {
   const [root, setRoot] = useState(use(data))
   updateRoot = setRoot
   return root
 }
 
-hydrateRoot(document.getElementById("root")!, createElement(Shell, { data }));
-// createRoot(document.getElementById("root")!).render(<Shell data={data} />)
+hydrateRoot(document.getElementById("root")!, createElement(Shell, { data }))
