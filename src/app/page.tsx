@@ -20,7 +20,7 @@ const Page = () => {
         </section>
 
         <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
-          Follow to: <a href="/hey">Hey!</a> - ({Math.random()})
+          Follow to: <a href="/hey">Hey!</a> {/* - ({Math.random()}) */}
         </nav>
       </main>
 

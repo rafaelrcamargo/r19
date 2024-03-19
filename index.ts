@@ -1,17 +1,17 @@
 import { resolve, relative } from "path"
 import { readdir } from "fs/promises"
-
-import React, { createElement, type ReactElement } from "react"
-import { renderToPipeableStream, decodeReply } from "react-server-dom-esm/server"
-
-// SSR
-import { createFromNodeStream } from "react-server-dom-esm/client.node"
-import { renderToPipeableStream as DOM_renderToPipeableStream } from "react-dom/server.node"
+import http from "http"
 
 import express from "express"
-import type { Response } from "express-serve-static-core"
 import bodyParser from "body-parser"
-import morgan from "morgan"
+import { logger } from "./utils"
+
+// RSC
+import { renderToPipeableStream, decodeReply } from "react-server-dom-esm/server"
+import { createElement, use } from "react"
+// SSR
+import { renderToPipeableStream as DOM_renderToPipeableStream } from "react-dom/server.node"
+import { createFromNodeStream } from "react-server-dom-esm/client.node"
 
 const moduleBaseURL = "/build/"
 
@@ -34,30 +34,29 @@ const server = await Bun.build({
         build.onLoad({ filter: /\.(ts|tsx)$/ }, async args => {
           const content = await Bun.file(args.path).text()
 
-          // If there are no directives, we let it be bundled
           const uses = content.match(/(?:^|\n|;)("use (client|server)";?)/)
-          if (!uses) return { contents: content }
+          if (!uses) return { contents: content } // If there are no directives, we let it be bundled
 
           const { exports } = new Bun.Transpiler({ loader: "tsx" }).scan(content)
-          if (exports.length === 0) return { contents: content }
+          if (exports.length === 0) return { contents: content } // If there are no exports, we also let it be bundled
 
           const refs = exports.map(e => {
             const path = `/${relative(".", args.path).replace("src", "build").replace(".tsx", ".js").replace(".ts", ".js")}`
 
-            // If it is a server component, we add things in a error-throwing function to avoid shipping the code to the client
             return uses[2] === "server"
-              ? `\n\nexport const ${e}=()=>{throw new Error("This should only run on the server")};${e}.$$typeof=Symbol.for("react.server.reference");${e}.$$id="${path}#${e}";${e}.$$bound=null;`
+              ? // If it is a server component, we add fields to a error-throwing function to avoid shipping the code to the client
+                `\n\nexport const ${e}=()=>{throw new Error("This should only run on the server")};${e}.$$typeof=Symbol.for("react.server.reference");${e}.$$id="${path}#${e}";${e}.$$bound=null;`
               : `${e === "default" ? "export default {" : `export const ${e} = {`}$$typeof:Symbol.for("react.client.reference"),$$id:"${path}#${e}",$$async:true};`
           })
 
-          return { contents: refs.join("\n\n"), loader: "tsx" }
+          return { contents: refs.join("\n\n") }
         })
       }
     }
   ]
 })
 
-console.log("Successful build?", server.success, server)
+console.log("Successful build?", server.success)
 console.log("\n----------------- Building the components\n")
 
 const components = (await readdir(resolve("src/components"), { recursive: true })).map(file =>
@@ -69,82 +68,52 @@ const client = await Bun.build({
   splitting: true,
   entrypoints: [resolve("src/_client.tsx"), resolve("src/_layout.tsx"), ...components],
   outdir: resolve("build")
-  // TODO: Add the $$ props to server and client components to be able to validate when needed
 })
 
-console.log("Successful build?", client.success, client)
+console.log("Successful build?", client.success)
 console.log("\n----------------- Listening on http://localhost:3000\n")
 
-const app = express()
-app.use(morgan("tiny") as any)
-app.use("/build", express.static("build"))
+express()
+  .use(logger)
+  .use("/build", express.static("build"))
+  .get("/*", async (req, res) => {
+    const url = new URL(req.url, `http://${req.headers.host}`)
 
-import http from "http"
-
-app.get("/*", async (req, res) => {
-  const { search } = new URL(req.url, `http://${req.headers.host}`)
-  if (search.includes("__RSC")) {
-    const props = req.query
-    delete props["__RSC"]
-
-    let rsc
-    try {
-      rsc = React.createElement((await import(resolve("build/app", `.${req.path}/page.js`))).default)
-    } catch (e) {
-      console.error(e)
-      rsc = "404 Not found"
-    }
-    renderToPipeableStream(rsc, moduleBaseURL).pipe(res)
-  } else {
-    // Need to get the rest of the search params on this request
-    http.get(`http://localhost:3000/${req.path}?__RSC=true`, async rsc => {
-      let root: any
-      let Root = () => {
-        if (root) return React.use(root)
-        return React.use((root = createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL)))
-      }
-
-      res.set("Content-type", "text/html")
-      const Layout = (await import(resolve("build/_layout"))).default
-      DOM_renderToPipeableStream(createElement(Layout, { children: createElement(Root) })).pipe(res)
-    })
-  }
-})
-
-app.post("/*", bodyParser.text(), async (req, res) => {
-  const { search } = new URL(req.url, `http://${req.headers.host}`)
-  if (search.includes("__RSA")) {
-    const actionReference = String(req.headers["rsa-reference"])
-    const actionOrigin = String(req.headers["rsa-origin"])
-
-    const [filepath, name] = actionReference.split("#")
-    const action = (await import(`.${resolve(filepath)}`))[name]
-
-    // TODO: Validate the action
-    /* if (action.$$typeof !== Symbol.for("react.server.reference"))
-    throw new Error("Invalid action"); */
-
-    const args = await decodeReply(req.body, moduleBaseURL)
-    const result = action.apply(null, args)
-
-    try {
-      await result
-    } catch (e) {
-      console.error(e)
-      res.send(e)
+    if (!url.search.includes("__RSC")) {
+      url.searchParams.set("__RSC", "true") // Let's re-use the url and forward to the API
+      return http.get(url.toString(), async rsc => {
+        let Root = () => use(createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL)) // Create a root component from the RSC result
+        const Layout = (await import(resolve("build/_layout"))).default // Load a HTML shell layout
+        DOM_renderToPipeableStream(createElement(Layout, { children: createElement(Root) })).pipe(res) // Render the the element as html and send it to the client
+      })
     }
 
-    const App = (await import(resolve("build/app", `.${actionOrigin}/page.js`))).default
-    renderApp(res, result, createElement(App))
-  }
-})
+    try {
+      const { __RSC, ...props } = req.query // We will use the query as props for the page
 
-app.listen(3000)
+      renderToPipeableStream(
+        createElement((await import(resolve("build/app", `.${req.path}/page.js`))).default, props),
+        moduleBaseURL
+      ).pipe(res)
+    } catch (e) {
+      console.error(e), res.send(e)
+    }
+  })
+  .post("/*", bodyParser.text(), async (req, res) => {
+    const { search } = new URL(req.url, `http://${req.headers.host}`)
+    if (search.includes("__RSA")) {
+      const actionReference = String(req.headers["rsa-reference"])
+      const actionOrigin = String(req.headers["rsa-origin"])
 
-// ----------------------------------------------------------------
+      // Resolve the action
+      const [filepath, name] = actionReference.split("#")
+      const action = (await import(`.${resolve(filepath)}`))[name]
 
-async function renderApp(res: Response, returnValue: unknown, root: ReactElement) {
-  // For client-invoked server actions we refresh the tree and return a return value.
-  const payload = returnValue ? { returnValue, root } : root
-  renderToPipeableStream(payload, moduleBaseURL).pipe(res)
-}
+      const args = await decodeReply(req.body, moduleBaseURL) // Decode the arguments
+      const returnValue = await action.apply(null, args) // Call the action
+
+      const root = createElement((await import(resolve("build/app", `.${actionOrigin}/page.js`))).default)
+      renderToPipeableStream({ returnValue, root }, moduleBaseURL).pipe(res) // Render the app with the RSC, action result and the new root
+    }
+  })
+  .listen(3000)

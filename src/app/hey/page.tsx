@@ -9,9 +9,12 @@ const Page = async (props: {}) => {
         <h1 className="text-2xl font-bold">Hello from /hey!</h1>
         <section>
           <p className="mt-4">
-            Server side props: <small>(Search Params)</small>
+            Server props: <small>(URL search params)</small>
           </p>
           <Prism language="json">{JSON.stringify(props, null, 2)}</Prism>
+          <small className="opacity-50">
+            This was rendered on the server, and no JS was sent to the client for the syntax highlighting.
+          </small>
         </section>
 
         {/* <Greet action={addLike} /> */}
