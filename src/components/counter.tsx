@@ -1,7 +1,7 @@
 "use client"
 
-import { useReducer } from "react"
-import { Toaster, toast } from "sonner"
+import React, { useReducer } from "react"
+import { toast, Toaster } from "sonner"
 
 export default () => {
   const [count, increment] = useReducer(count => count + 1, 0)

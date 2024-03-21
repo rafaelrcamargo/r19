@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import React, { useState, useTransition } from "react"
 
 export default ({ action }: any) => {
   const [isPending, startTransition] = useTransition()
