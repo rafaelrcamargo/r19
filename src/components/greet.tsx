@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useState, useTransition } from "react"
 
 export default ({ action }: any) => {

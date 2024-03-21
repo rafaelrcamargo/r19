@@ -1,13 +1,20 @@
-import { createFromFetch, encodeReply } from "react-server-dom-esm/client.browser"
-import { useState, startTransition, use, createElement, type Dispatch } from "react"
+import { createElement, startTransition, use, useState, type Dispatch } from "react"
 import { hydrateRoot } from "react-dom/client"
+import { createFromFetch, encodeReply } from "react-server-dom-esm/client"
 
+// Global
 const moduleBaseURL = "/build/"
-
 let updateRoot: Dispatch<any>
+
 const callServer = async (id: string, args: unknown[]): Promise<unknown> => {
+  const url = new URL(window.location.href)
+  const search = new URLSearchParams(window.location.search)
+  search.set("__RSA", "true")
+  url.port = "3001" // Forward to the SSR API
+  url.search = search.toString()
+
   const fromFetch = await createFromFetch(
-    fetch(`/?__RSA=true`, {
+    fetch(url, {
       method: "POST",
       headers: { "rsa-origin": window.location.pathname, "rsa-reference": id },
       body: await encodeReply(args)
@@ -19,9 +26,11 @@ const callServer = async (id: string, args: unknown[]): Promise<unknown> => {
   return fromFetch.returnValue
 }
 
+/* Render */
 const url = new URL(window.location.href)
 const search = new URLSearchParams(window.location.search)
 search.set("__RSC", "true")
+url.port = "3001" // Forward to the SSR API
 url.search = search.toString()
 
 const data = createFromFetch(fetch(url), { callServer, moduleBaseURL })

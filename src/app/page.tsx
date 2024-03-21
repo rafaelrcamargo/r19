@@ -2,6 +2,7 @@ import { Suspense } from "react"
 
 import Counter from "../components/counter"
 import OS from "../components/os"
+import React from "react"
 
 const Page = () => {
   return (

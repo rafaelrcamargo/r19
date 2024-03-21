@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from "react"
+import React from "react"
 
 export default ({ children }: PropsWithChildren) => (
   <html>
@@ -7,7 +8,6 @@ export default ({ children }: PropsWithChildren) => (
     </head>
     <body>
       <div id="root">{children}</div>
-      <script type="module" src="/build/_client.js" />
     </body>
   </html>
 )

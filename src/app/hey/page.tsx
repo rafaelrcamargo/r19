@@ -1,6 +1,8 @@
 import { Prism } from "react-syntax-highlighter"
+
 import { addLike } from "../../components/actions"
 import Greet from "../../components/greet"
+import React from "react"
 
 const Page = async (props: {}) => {
   return (
@@ -17,7 +19,7 @@ const Page = async (props: {}) => {
           </small>
         </section>
 
-        {/* <Greet action={addLike} /> */}
+        <Greet action={addLike} />
 
         <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
           Follow to broken: <a href="/random">404</a>

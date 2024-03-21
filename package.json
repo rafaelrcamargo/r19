@@ -3,9 +3,38 @@
   "type": "module",
   "module": "index.ts",
   "scripts": {
-    "dev": "bun --conditions='react-server' index.ts",
-    "format": "prettier --ignore-unknown --write . --ignore-path .gitignore",
-    "setup": "cp -r ../react/build/oss-experimental/* ./node_modules/"
+    "build": "bun build.ts",
+    "predev": "cp -r ../react/build/oss-experimental/* ./node_modules/",
+    "dev": "bun run build && bunx concurrently \"bun dev:rsc\" \"bun dev:ssr\"",
+    "dev:rsc": "NODE_ENV=development bun --conditions='react-server' rsc.ts",
+    "dev:ssr": "NODE_ENV=development bun ssr.ts",
+    "format": "prettier --ignore-unknown --write ."
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "bracketSameLine": true,
+    "bracketSpacing": true,
+    "importOrder": [
+      "<BUILTIN_MODULES>",
+      "",
+      "^react*",
+      "<THIRD_PARTY_MODULES>",
+      "",
+      "^[.]"
+    ],
+    "importOrderParserPlugins": [
+      "typescript",
+      "jsx",
+      "decorators-legacy"
+    ],
+    "importOrderTypeScriptVersion": "5.0.0",
+    "plugins": [
+      "@ianvs/prettier-plugin-sort-imports"
+    ],
+    "printWidth": 120,
+    "semi": false,
+    "singleQuote": false,
+    "trailingComma": "none"
   },
   "dependencies": {
     "express": "^4.18.3",
@@ -14,6 +43,7 @@
     "sonner": "^1.4.3"
   },
   "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.2.1",
     "@types/bun": "latest",
     "@types/express": "^4.17.21",
     "@types/react": "latest",
