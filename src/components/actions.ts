@@ -1,9 +1,8 @@
 "use server"
 
-let likeCount = 0
-export async function addLike() {
-  console.log("addLike", likeCount)
-
-  likeCount++
-  return likeCount
+let counter = 0
+export async function add() {
+  return new Promise<number>(resolve => {
+    setTimeout(() => resolve(counter++), Math.random() * 1000)
+  })
 }

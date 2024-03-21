@@ -29,7 +29,8 @@
     ],
     "importOrderTypeScriptVersion": "5.0.0",
     "plugins": [
-      "@ianvs/prettier-plugin-sort-imports"
+      "@ianvs/prettier-plugin-sort-imports",
+      "prettier-plugin-tailwindcss"
     ],
     "printWidth": 120,
     "semi": false,
@@ -48,7 +49,8 @@
     "@types/express": "^4.17.21",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/react-syntax-highlighter": "^15.5.11"
+    "@types/react-syntax-highlighter": "^15.5.11",
+    "prettier-plugin-tailwindcss": "^0.5.12"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

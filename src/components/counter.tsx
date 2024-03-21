@@ -10,13 +10,13 @@ export default () => {
     <>
       <Toaster closeButton />
 
-      <button onClick={increment} className="text-xl w-full h-14 bg-blue-100 hover:bg-blue-200">
+      <button onClick={increment} className="h-14 w-full bg-blue-100 text-xl hover:bg-blue-200">
         {count}
       </button>
 
       <button
         onClick={() => toast("Message from the client!")}
-        className="text-xl w-full border-l-4 border-dashed border-blue-400 h-14 bg-blue-100 hover:bg-blue-200">
+        className="h-14 w-full border-l-4 border-dashed border-blue-400 bg-blue-100 text-xl hover:bg-blue-200">
         Toast!
       </button>
     </>

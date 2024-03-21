@@ -6,21 +6,21 @@ import OS from "../components/os"
 const Page = () => {
   return (
     <>
-      <main className="m-4 p-4 border-4 border-dashed border-red-400">
+      <main className="m-4 border-4 border-dashed border-red-400 p-4">
         <h1 className="text-2xl font-bold">Hello from the Server!</h1>
 
         <p>
           You're running <OS />
         </p>
 
-        <section className="mt-4 border-4 h-16 flex items-center justify-center border-dashed border-blue-400">
+        <section className="mt-4 flex h-16 items-center justify-center border-4 border-dashed border-blue-400">
           <Suspense fallback={"Loading..."}>
             <Counter />
           </Suspense>
         </section>
 
         <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
-          Follow to: <a href="/hey">Hey!</a> {/* - ({Math.random()}) */}
+          Follow to: <a href="/action">/action</a>
         </nav>
       </main>
 

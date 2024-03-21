@@ -1,14 +1,14 @@
 import React from "react"
 import { Prism } from "react-syntax-highlighter"
 
-import { addLike } from "../../components/actions"
-import Greet from "../../components/greet"
+import { add } from "../../components/actions"
+import Counter from "../../components/count"
 
 const Page = async (props: {}) => {
   return (
     <>
-      <main className="m-4 p-4 border-4 border-dashed border-red-400">
-        <h1 className="text-2xl font-bold">Hello from /hey!</h1>
+      <main className="m-4 border-4 border-dashed border-red-400 p-4">
+        <h1 className="text-2xl font-bold">Hello from /action!</h1>
         <section>
           <p className="mt-4">
             Server props: <small>(URL search params)</small>
@@ -19,10 +19,10 @@ const Page = async (props: {}) => {
           </small>
         </section>
 
-        <Greet action={addLike} />
+        <Counter action={add} />
 
         <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
-          Follow to broken: <a href="/random">404</a>
+          Go back to: <a href="/">Home</a>
         </nav>
       </main>
     </>
