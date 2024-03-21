@@ -1,7 +1,6 @@
 "use client"
 
-import React from "react"
-import { useReducer } from "react"
+import React, { useReducer } from "react"
 import { toast, Toaster } from "sonner"
 
 export default () => {

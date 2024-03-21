@@ -1,8 +1,8 @@
+import React from "react"
 import { Prism } from "react-syntax-highlighter"
 
 import { addLike } from "../../components/actions"
 import Greet from "../../components/greet"
-import React from "react"
 
 const Page = async (props: {}) => {
   return (
