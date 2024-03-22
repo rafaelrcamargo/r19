@@ -12,7 +12,6 @@ const server = await Bun.build({
   target: "bun",
   entrypoints: pages,
   external: ["react", "react-dom"],
-  publicPath: "https://esm.sh/", // default is undefined
   outdir: resolve("build", "app"),
   plugins: [
     {

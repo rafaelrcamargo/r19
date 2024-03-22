@@ -22,7 +22,7 @@ const Page = async (props: {}) => {
         <Counter action={add} />
 
         <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
-          Go back to: <a href="/">Home</a>
+          Go back to: <a href="/">/</a>
         </nav>
       </main>
     </>

@@ -4,19 +4,16 @@ import { decodeReply, renderToPipeableStream } from "react-server-dom-esm/server
 import bodyParser from "body-parser"
 import express from "express"
 
-import { logger } from "./utils"
+import { cors, logger } from "./utils"
 
 const moduleBaseURL = "/build/"
+const port = 3001
 
-console.log("----------------- Listening on http://localhost:3001")
+console.log(`----------------- Listening on http://localhost:${port}`)
 
 express()
   .use(logger)
-  .use((_, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*")
-    res.header("Access-Control-Allow-Headers", "*")
-    next()
-  })
+  .use(cors)
   .get("/*", async (req, res) => {
     const { __RSC, ...props } = req.query // We will use the query as props for the page
     renderToPipeableStream(
@@ -26,7 +23,7 @@ express()
   })
   .post("/*", bodyParser.text(), async (req, res) => {
     const { search } = new URL(req.url, `http://${req.headers.host}`)
-    console.log(search)
+
     if (search.includes("__RSA")) {
       const actionReference = String(req.headers["rsa-reference"])
       const actionOrigin = String(req.headers["rsa-origin"])
@@ -43,4 +40,4 @@ express()
       renderToPipeableStream({ returnValue, root }, moduleBaseURL).pipe(res) // Render the app with the RSC, action result and the new root
     }
   })
-  .listen(3001)
+  .listen(port)
