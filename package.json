@@ -32,7 +32,7 @@
       "@ianvs/prettier-plugin-sort-imports",
       "prettier-plugin-tailwindcss"
     ],
-    "printWidth": 120,
+    "printWidth": 110,
     "semi": false,
     "singleQuote": false,
     "trailingComma": "none"

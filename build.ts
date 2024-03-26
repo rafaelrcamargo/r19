@@ -1,5 +1,7 @@
 import { readdir } from "fs/promises"
-import { parse, relative, resolve } from "path"
+import { resolve } from "path"
+
+import { createReference } from "./utils"
 
 console.log("----------------- Building the pages")
 await Bun.$`rm -rf ./build/`
@@ -27,12 +29,7 @@ const server = await Bun.build({
           if (exports.length === 0) return { contents: content } // If there are no exports, we also let it be bundled
 
           return {
-            contents: exports
-              .map(e => {
-                console.log(e, args.path, directives[2], createReference(e, args.path, directives[2]))
-                return createReference(e, args.path, directives[2])
-              })
-              .join("\n\n")
+            contents: exports.map(e => createReference(e, args.path, directives[2])).join("\n")
           }
         })
       }
@@ -40,18 +37,7 @@ const server = await Bun.build({
   ]
 })
 
-const createReference = (e: string, path: string, directive: string) => {
-  console.log(e, path, directive)
-  const id = `/${relative(".", path).replace("src", "build").replace(/\..+$/, ".js")}#${e}` // React uses this to identify the component
-  const mod = `${e === "default" ? parse(path).base.replace(/\..+$/, "") : ""}_${e}` // We create a unique name for the component export
-
-  return directive === "server"
-    ? // In case the of a server components, we add properties to a mock up function to avoid shipping the code to the client
-      `const ${mod}=()=>{throw new Error("This function is expected to only run on the server")};${mod}.$$typeof=Symbol.for("react.server.reference");${mod}.$$id="${id}";${mod}.$$bound=null;${e === "default" ? `export{${mod} as default}` : `export {${mod} as ${e}}`};`
-    : `${e === "default" ? "export default {" : `export const ${e} = {`}$$typeof:Symbol.for("react.client.reference"),$$id:"${id}",$$async:true};`
-}
-
-console.log("Successful build?", server)
+console.log("Successful build?", server.success)
 console.log("----------------- Building the components")
 
 const components = (await readdir(resolve("src"), { recursive: true }))
@@ -60,7 +46,6 @@ const components = (await readdir(resolve("src"), { recursive: true }))
 
 const client = await Bun.build({
   target: "bun",
-  splitting: true,
   external: ["react", "react-dom", "react-server-dom-esm"],
   entrypoints: components,
   outdir: resolve("build")

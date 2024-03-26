@@ -1,0 +1,27 @@
+import React from "react"
+import { Prism } from "react-syntax-highlighter"
+
+const Page = async (props: {}) => (
+  <>
+    <main className="m-4 border-4 border-dashed border-red-400 p-4">
+      <h1 className="text-2xl font-bold">Hello from /props!</h1>
+
+      <section>
+        <p className="mt-4">
+          Server props: <small>(Look at your URL!)</small>
+        </p>
+        <Prism language="json">{JSON.stringify(props, null, 2)}</Prism>
+        <small className="opacity-50">
+          This was rendered on the server, and no JS was sent to the client for the <i>(huge)</i> syntax
+          highlighting lib.
+        </small>
+      </section>
+
+      <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
+        Go back to: <a href="/">/</a>
+      </nav>
+    </main>
+  </>
+)
+
+export default Page
