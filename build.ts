@@ -6,20 +6,30 @@ import { createReference } from "./utils"
 console.log("----------------- Building the pages")
 await Bun.$`rm -rf ./build/`
 
-const pages = (await readdir(resolve("src/app"), { recursive: true }))
-  .filter(file => file.endsWith("page.tsx"))
-  .map(page => resolve("src/app", page))
+const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
+  (acc, file) => {
+    const ext = file.match(/\..+$/)
+    if (!ext) return acc
+    const path = resolve("src", file)
+    if (file.endsWith("page.tsx")) acc.pages.push(path)
+    else if (ext[0].match(/\.tsx?$/)) acc.components.push(path)
+    else acc.assets.push(path)
+    return acc
+  },
+  { pages: [], components: [], assets: [] } as Record<string, string[]>
+)
 
 const server = await Bun.build({
   target: "bun",
-  entrypoints: pages,
+  splitting: true,
+  entrypoints: entries.pages,
   external: ["react", "react-dom"],
   outdir: resolve("build", "app"),
   plugins: [
     {
       name: "rsc-server",
       setup(build) {
-        build.onLoad({ filter: /\.(ts|tsx)$/ }, async args => {
+        build.onLoad({ filter: /\.tsx?$/ }, async args => {
           const content = await Bun.file(args.path).text()
 
           const directives = content.match(/(?:^|\n|;)("use (client|server)";?)/)
@@ -40,15 +50,17 @@ const server = await Bun.build({
 console.log("Successful build?", server.success)
 console.log("----------------- Building the components")
 
-const components = (await readdir(resolve("src"), { recursive: true }))
-  .filter((file: string) => file.match(/\..+$/g) && !(file.endsWith(".d.ts") || file.endsWith("page.tsx")))
-  .map((file: string) => resolve("src", file))
-
 const client = await Bun.build({
   target: "bun",
   external: ["react", "react-dom", "react-server-dom-esm"],
-  entrypoints: components,
+  entrypoints: entries.components,
   outdir: resolve("build")
 })
 
 console.log("Successful build?", client.success)
+
+console.log("----------------- Copying assets")
+entries.assets.forEach(asset => Bun.write(asset.replace("src", "build"), Bun.file(asset)))
+console.log("Done!")
+
+// console.log(pages.map(page => page.split("/").at(-2)))

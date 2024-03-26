@@ -1,7 +1,7 @@
 import React from "react"
 import { Prism } from "react-syntax-highlighter"
 
-const Page = async (props: {}) => (
+export const Page = async (props: unknown) => (
   <>
     <main className="m-4 border-4 border-dashed border-red-400 p-4">
       <h1 className="text-2xl font-bold">Hello from /props!</h1>

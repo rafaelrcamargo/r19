@@ -6,8 +6,8 @@
     "build": "bun build.ts",
     "predev": "cp -r ../react/build/oss-experimental/* ./node_modules/",
     "dev": "bun run build && bunx concurrently \"bun dev:rsc\" \"bun dev:ssr\"",
-    "dev:rsc": "NODE_ENV=development bun --conditions='react-server' rsc.ts",
-    "dev:ssr": "NODE_ENV=development bun ssr.ts",
+    "dev:rsc": "bun --conditions='react-server' rsc.ts",
+    "dev:ssr": "bun ssr.ts",
     "format": "prettier --ignore-unknown --write ."
   },
   "prettier": {
