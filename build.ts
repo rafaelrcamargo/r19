@@ -1,3 +1,4 @@
+import { spawn } from "child_process"
 import { readdir } from "fs/promises"
 import { resolve } from "path"
 
@@ -21,7 +22,6 @@ const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
 
 const server = await Bun.build({
   target: "bun",
-  splitting: true,
   entrypoints: entries.pages,
   external: ["react", "react-dom"],
   outdir: resolve("build", "app"),
@@ -47,7 +47,7 @@ const server = await Bun.build({
   ]
 })
 
-console.log("Successful build?", server.success)
+console.log("Successful build?", server)
 console.log("----------------- Building the components")
 
 const client = await Bun.build({
@@ -62,5 +62,3 @@ console.log("Successful build?", client.success)
 console.log("----------------- Copying assets")
 entries.assets.forEach(asset => Bun.write(asset.replace("src", "build"), Bun.file(asset)))
 console.log("Done!")
-
-// console.log(pages.map(page => page.split("/").at(-2)))
