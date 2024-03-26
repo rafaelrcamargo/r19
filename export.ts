@@ -12,4 +12,6 @@ const exports = await Promise.all(
   ])
 )
 
-exports.map(([page, content]) => Bun.write(`./build/export/${page === "app" ? "index" : page}.html`, content))
+exports.map(([page, content]) =>
+  Bun.write(`./build/export/${page === "app" ? "index" : page}.html`, content!)
+)
