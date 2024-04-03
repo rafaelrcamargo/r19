@@ -1,11 +1,9 @@
-import { spawn } from "child_process"
 import { readdir } from "fs/promises"
 import { resolve } from "path"
-
 import { createReference } from "./utils"
 
-console.log("----------------- Building the pages")
-await Bun.$`rm -rf ./build/`
+console.log("\n----------------- Cleaning build artifacts")
+console.log("Successful clean?", (await Bun.$`rm -rf ./build/`).exitCode === 0)
 
 const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
   (acc, file) => {
@@ -20,6 +18,7 @@ const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
   { pages: [], components: [], assets: [] } as Record<string, string[]>
 )
 
+console.log("----------------- Building the pages")
 const server = await Bun.build({
   target: "bun",
   entrypoints: entries.pages,
@@ -46,19 +45,17 @@ const server = await Bun.build({
     }
   ]
 })
+console.log("Successful build?", server.success)
 
-console.log("Successful build?", server)
 console.log("----------------- Building the components")
-
 const client = await Bun.build({
   target: "bun",
   external: ["react", "react-dom", "react-server-dom-esm"],
   entrypoints: entries.components,
   outdir: resolve("build")
 })
-
 console.log("Successful build?", client.success)
 
-console.log("----------------- Copying assets")
 entries.assets.forEach(asset => Bun.write(asset.replace("src", "build"), Bun.file(asset)))
-console.log("Done!")
+
+console.log("----------------- Done! 🎉\n")

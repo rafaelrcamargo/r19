@@ -1,9 +1,7 @@
 import { resolve } from "path"
-
 import { decodeReply, renderToPipeableStream } from "react-server-dom-esm/server.node"
 import bodyParser from "body-parser"
 import express from "express"
-
 import { cors, logger } from "./utils"
 
 const moduleBaseURL = "/build/"
@@ -16,10 +14,14 @@ express()
   .use(cors)
   .get("/*", async (req, res) => {
     const { __RSC, ...props } = req.query // We will use the query as props for the page
-    renderToPipeableStream(
-      (await import(resolve("build/app", `.${req.path}/page.js`))).default(props),
-      moduleBaseURL
-    ).pipe(res)
+    let mod
+    try {
+      mod = (await import(resolve("build/app", `.${req.path}/page.js`))).default(props)
+    } catch {
+      console.error(`Not found: ${req.path}`)
+      mod = "404 Not Found"
+    }
+    renderToPipeableStream(mod, moduleBaseURL).pipe(res)
   })
   .post("/*", bodyParser.text(), async (req, res) => {
     const { search } = new URL(req.url, `http://${req.headers.host}`)
