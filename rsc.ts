@@ -1,6 +1,7 @@
 import { resolve } from "path"
-import { decodeReply, renderToPipeableStream } from "react-server-dom-esm/server.node"
+import { decodeReply, decodeReplyFromBusboy, renderToPipeableStream } from "react-server-dom-esm/server.node"
 import bodyParser from "body-parser"
+import busboy from "busboy"
 import express from "express"
 import { cors, logger } from "./utils"
 
@@ -35,7 +36,17 @@ express()
       const [filepath, name] = actionReference.split("#")
       const action = (await import(`.${resolve(filepath)}`))[name]
 
-      const args = await decodeReply(req.body, moduleBaseURL) // Decode the arguments
+      let args // Decode the arguments
+      if (req.is("multipart/form-data")) {
+        // Use busboy to streamingly parse the reply from form-data.
+        const bb = busboy({ headers: req.headers })
+        const reply = decodeReplyFromBusboy(bb, resolve("build/") + "/")
+        req.pipe(bb)
+        args = await reply
+      } else {
+        args = await decodeReply(req.body, moduleBaseURL)
+      }
+
       const returnValue = await action.apply(null, args) // Call the action
 
       const root = (await import(resolve("build/app", `.${actionOrigin}/page.js`))).default(props)

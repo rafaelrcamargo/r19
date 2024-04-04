@@ -1,0 +1,13 @@
+import React from "react"
+import { signup } from "../../components/actions"
+import { Form } from "../../components/form"
+
+const Page = () => {
+  return (
+    <main className="m-4 border-4 border-dashed border-red-400 p-4">
+      <Form action={signup} />
+    </main>
+  )
+}
+
+export default Page

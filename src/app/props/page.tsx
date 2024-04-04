@@ -21,7 +21,7 @@ export const Page = async (props: unknown) => {
           <link rel="stylesheet" href={resolve("/build/app/props", styles)} />
           {/* Here we use the generated HTML to render the highlighting */}
           <div
-            className="my-2 rounded-md bg-[#22272e] p-4 text-[#cdd9e5] shadow-md"
+            className="my-2 rounded-md bg-[#22272e] p-4 text-[#cdd9e5]"
             dangerouslySetInnerHTML={{ __html: html }}
           />
 
