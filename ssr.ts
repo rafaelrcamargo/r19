@@ -1,11 +1,9 @@
 import http from "http"
 import { resolve } from "path"
-
 import { createElement, use } from "react"
 import { renderToPipeableStream } from "react-dom/server.node"
 import { createFromNodeStream } from "react-server-dom-esm/client.node"
 import express from "express"
-
 import { logger } from "./utils"
 
 const moduleBaseURL = "/build/"
@@ -17,10 +15,9 @@ express()
   .use(logger)
   .use("/build", express.static("build"))
   .use("/node_modules", express.static("node_modules"))
+  .get(/\.(?!js).+$/, express.static("build"))
   .get("/*", async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`)
-
-    if (url.pathname.includes("favicon.ico")) return res.end() // Ignore favicon requests
 
     url.port = "3001" // Forward to the SSR API server
     url.searchParams.set("__RSC", "true") // Let's re-use the url and forward to the API

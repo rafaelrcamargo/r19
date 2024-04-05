@@ -1,44 +1,41 @@
-import { createElement, startTransition, use, useState, type Dispatch } from "react"
+import { createElement, use, type FC, type ReactNode } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { createFromFetch, encodeReply } from "react-server-dom-esm/client"
 
-// Global
+// The *server* path of the modules
 const moduleBaseURL = "/build/"
-let updateRoot: Dispatch<any>
 
-const callServer = async (id: string, args: unknown[]): Promise<unknown> => {
-  const url = new URL(window.location.href)
-  const search = new URLSearchParams(window.location.search)
+// Function to prepare a URL to a action call on the RSC server
+const getUrl = () => {
+  const url = new URL("http://localhost:3001")
+  url.pathname = location.pathname
+  const search = new URLSearchParams(location.search)
   search.set("__RSA", "true")
-  url.port = "3001" // Forward to the SSR API
   url.search = search.toString()
-
-  const fromFetch = await createFromFetch(
-    fetch(url, {
-      method: "POST",
-      headers: { "rsa-origin": window.location.pathname, "rsa-reference": id },
-      body: await encodeReply(args)
-    }),
-    { callServer, moduleBaseURL }
-  )
-
-  startTransition(() => updateRoot(fromFetch.root))
-  return fromFetch.returnValue
+  return url
 }
 
-/* Render */
-const url = new URL(window.location.href)
-const search = new URLSearchParams(window.location.search)
-search.set("__RSC", "true")
-url.port = "3001" // Forward to the SSR API
-url.search = search.toString()
+// This is the one that will handle the calls to resolve the actions
+const callServer = async (id: string, args: unknown[]) =>
+  (
+    await createFromFetch(
+      fetch(getUrl(), {
+        method: "POST",
+        body: await encodeReply(args),
+        headers: {
+          "rsa-origin": location.pathname, // Tells the server where the call is coming from
+          "rsa-reference": id // Tells the server which action is being called
+        }
+      }),
+      { callServer, moduleBaseURL }
+    )
+  ).returnValue
 
-const data = createFromFetch(fetch(url), { callServer, moduleBaseURL })
+// `createFromFetch` will get the data to hydrate the page
+const data = createFromFetch(fetch(getUrl()), { callServer, moduleBaseURL })
 
-const Shell = ({ data }: any) => {
-  const [root, setRoot] = useState(use(data))
-  updateRoot = setRoot
-  return root
-}
+// This will transform the ReactNode stream into a ReactNode tree
+const Shell: FC<{ data: ReactNode }> = ({ data }) => use(data)
 
+// Finally this will then hydrate the page with the `Shell` component as the root
 hydrateRoot(document.getElementById("root")!, createElement(Shell, { data }))
