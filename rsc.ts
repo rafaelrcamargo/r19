@@ -19,8 +19,7 @@ express()
     try {
       mod = (await import(resolve("build/app", `.${req.path}/page.js`))).default(props)
     } catch {
-      console.error(`Not found: ${req.path}`)
-      mod = "404 Not Found"
+      mod = "Not Found"
     }
     renderToPipeableStream(mod, moduleBaseURL).pipe(res)
   })
@@ -36,13 +35,11 @@ express()
       const [filepath, name] = actionReference.split("#")
       const action = (await import(`.${resolve(filepath)}`))[name]
 
-      let args // Decode the arguments
+      let args
       if (req.is("multipart/form-data")) {
-        // Use busboy to streamingly parse the reply from form-data.
-        const bb = busboy({ headers: req.headers })
-        const reply = decodeReplyFromBusboy(bb, resolve("build/") + "/")
+        const bb = busboy({ headers: req.headers }) // Use busboy to streamingly parse the reply from form-data.
+        args = await decodeReplyFromBusboy(bb, resolve("build/") + "/")
         req.pipe(bb)
-        args = await reply
       } else {
         args = await decodeReply(req.body, moduleBaseURL)
       }
