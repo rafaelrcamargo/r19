@@ -1,10 +1,12 @@
-# R19
+# 🧷 R19
 
-A React 19 "framework" from scratch.
+A React 19 "framework" **from scratch**.
 
 > The name was definitely not inspired by F1 cars. :))
 
 ## Features
+
+This has a lot of cool caveats, like using Bun for most of the internals and _(maybe)_ the first React 19 framework to implement ESM and not a bundler like Webpack to be bundled.
 
 - [x] Bundling
   - [x] TS Support
@@ -34,7 +36,7 @@ cd react
 yarn && yarn build
 ```
 
-Then, the `predev` script will copy the necessary files to the `node_modules` folder. (It expects the `react` repo to be in the same parent directory as this repo.)
+Then, the `predev` script will copy the necessary files to the `node_modules` folder. _(It expects the `react` repo to be in the same parent directory as this repo.)_
 
 With all the dependencies set up, you can run the project with:
 
@@ -45,4 +47,4 @@ bun dev
 
 ## License
 
-I don't encourage anyone to use this project in production, not even close to it. This is just a fun project where all can learn more about React and its internals.
+I don't encourage anyone to use this project in production, **not even close to it**. This is just a fun project where all can learn more about React and its internals.
