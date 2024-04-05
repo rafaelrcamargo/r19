@@ -1,4 +1,4 @@
-# 🧷 R19
+# R19 🏎️
 
 A React 19 "framework" **from scratch**.
 
