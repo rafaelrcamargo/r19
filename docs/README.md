@@ -1,19 +1,48 @@
-# rsc
+# R19
 
-To install dependencies:
+A React 19 "framework" from scratch.
+
+> The name was definitely not inspired by F1 cars. :))
+
+## Features
+
+- [x] Bundling
+  - [x] TS Support
+    - [x] JSX Support
+  - [x] Assets (Images, Styles, etc...)
+- [x] File-based routing
+- [x] RSC (React Server Components)
+- [x] RSA (React Server Actions)
+- [x] SSR
+  - [x] Static export
+    - [x] Serve static files for default route states
+
+## Examples
+
+- [x] Simple
+  - A basic overview of the features
+- [ ] Advanced
+  - A more complex system with a SQLite database
+
+## Usage
+
+This project uses `react-server-dom-esm` as the "plugin" to integrate with most of the React 19 features. But this package is not published yet, so you need to clone the `react` repo and build it yourself.
 
 ```bash
-bun install
+git clone https://github.com/facebook/react.git
+cd react
+yarn && yarn build
 ```
 
-To run:
+Then, the `predev` script will copy the necessary files to the `node_modules` folder. (It expects the `react` repo to be in the same parent directory as this repo.)
+
+With all the dependencies set up, you can run the project with:
 
 ```bash
-bun run index.ts
+bun i
+bun dev
 ```
 
-This project was created using `bun init` in bun v1.0.25. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## License
 
-## Notes
-
-- Actions don't work on client components :/ (They may need to be tagged but not sure)
+I don't encourage anyone to use this project in production, not even close to it. This is just a fun project where all can learn more about React and its internals.
