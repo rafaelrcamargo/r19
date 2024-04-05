@@ -1,27 +1,28 @@
 import { readdir } from "fs/promises"
 import { resolve } from "path"
-import { createReference } from "./utils"
+import { createReference, log } from "./utils"
+import "colors"
 
-console.log("\n----------------- Cleaning build artifacts")
-console.log("Successful clean?", (await Bun.$`rm -rf ./build/`).exitCode === 0)
+log("Cleaning build artifacts")
+log("Successful clean?".dim, (await Bun.$`rm -rf ./build/`).exitCode === 0)
 
 const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
   (acc, file) => {
     const ext = file.match(/\..+$/)
     if (!ext) return acc
     const path = resolve("src", file)
-    if (file.endsWith("page.tsx")) acc.pages.push(path)
-    else if (ext[0].match(/\.tsx?$/)) acc.components.push(path)
-    else acc.assets.push(path)
+    if (file.endsWith("page.tsx")) acc["pages"].push(path)
+    else if (ext[0].match(/\.tsx?$/)) acc["components"].push(path)
+    else acc["assets"].push(path)
     return acc
   },
   { pages: [], components: [], assets: [] } as Record<string, string[]>
 )
 
-console.log("----------------- Building the pages")
+log("Building the pages")
 const server = await Bun.build({
   target: "bun",
-  entrypoints: entries.pages,
+  entrypoints: entries["pages"],
   external: ["react", "react-dom"],
   outdir: resolve("build", "app"),
   plugins: [
@@ -45,17 +46,16 @@ const server = await Bun.build({
     }
   ]
 })
-console.log("Successful build?", server.success)
+log("Successful build?".dim, server.success)
 
-console.log("----------------- Building the components")
+log("Building the components")
 const client = await Bun.build({
   target: "bun",
   external: ["react", "react-dom", "react-server-dom-esm"],
-  entrypoints: entries.components,
+  entrypoints: entries["components"],
   outdir: resolve("build")
 })
-console.log("Successful build?", client.success)
+log("Successful build?".dim, client.success)
 
-entries.assets.forEach(asset => Bun.write(asset.replace("src", "build"), Bun.file(asset)))
-
-console.log("----------------- Done! 🎉\n")
+entries["assets"].forEach(asset => Bun.write(asset.replace("src", "build"), Bun.file(asset)))
+log("Done! 🎉".bold)

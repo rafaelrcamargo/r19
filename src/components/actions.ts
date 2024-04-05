@@ -10,6 +10,5 @@ export const add = () => {
   return throttle(counter, Math.random() * 1000)
 }
 
-export const signup = async (_: {}, form: FormData) => {
-  return throttle({ message: `Signed up with ${form.get("email")}` }, Math.random() * 1000)
-}
+export const signup = async (_: {}, form: FormData) =>
+  throttle({ message: `Signed up with ${form.get("email")}` }, Math.random() * 1000)

@@ -4,12 +4,12 @@ import { createElement, use } from "react"
 import { renderToPipeableStream } from "react-dom/server.node"
 import { createFromNodeStream } from "react-server-dom-esm/client.node"
 import express from "express"
-import { logger } from "./utils"
+import { log, logger } from "./utils"
 
 const moduleBaseURL = "/build/"
 const port = 3000
 
-console.log(`----------------- Listening on http://localhost:${port}`)
+log(`Listening on http://localhost:${port}`)
 
 express()
   .use(logger)
@@ -20,6 +20,15 @@ express()
     const url = new URL(req.url, `http://${req.headers.host}`)
 
     url.port = "3001" // Forward to the SSR API server
+    if (url.searchParams.length === 0) {
+      const page = (req.path === "/" ? "index" : req.path.slice(1)) + ".html"
+      log("Defaulting to static page:", `"${page}"`.green)
+      try {
+        return res.send(await Bun.file(resolve("build/static/", "./" + page)).text())
+      } catch {
+        log("File not found, falling back to SSR".dim)
+      }
+    }
     url.searchParams.set("__RSC", "true") // Let's re-use the url and forward to the API
 
     return http.get(url.toString(), async rsc => {
@@ -42,3 +51,7 @@ express()
     })
   })
   .listen(port)
+
+new Worker(new URL("./export.ts", import.meta.url).href).addEventListener("close", _ =>
+  log("Pages exported successfully! 🚀".bold)
+)

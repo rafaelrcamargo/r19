@@ -3,12 +3,12 @@ import { decodeReply, decodeReplyFromBusboy, renderToPipeableStream } from "reac
 import bodyParser from "body-parser"
 import busboy from "busboy"
 import express from "express"
-import { cors, logger } from "./utils"
+import { cors, log, logger } from "./utils"
 
 const moduleBaseURL = "/build/"
 const port = 3001
 
-console.log(`----------------- Listening on http://localhost:${port}`)
+log(`Listening on http://localhost:${port}`)
 
 express()
   .use(logger)
@@ -35,11 +35,13 @@ express()
       const [filepath, name] = actionReference.split("#")
       const action = (await import(`.${resolve(filepath)}`))[name]
 
-      let args
+      let args // Decode the arguments
       if (req.is("multipart/form-data")) {
-        const bb = busboy({ headers: req.headers }) // Use busboy to streamingly parse the reply from form-data.
-        args = await decodeReplyFromBusboy(bb, resolve("build/") + "/")
+        // Use busboy to streamingly parse the reply from form-data.
+        const bb = busboy({ headers: req.headers })
+        const reply = decodeReplyFromBusboy(bb, resolve("build/") + "/")
         req.pipe(bb)
+        args = await reply
       } else {
         args = await decodeReply(req.body, moduleBaseURL)
       }

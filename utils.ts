@@ -1,5 +1,6 @@
 import { parse, relative } from "path"
 import type { Request, Response } from "express"
+import "colors"
 
 // Create the reference for the "client component" / "server action"
 export const createReference = (e: string, path: string, directive: string) => {
@@ -19,14 +20,17 @@ export const pad = (str: string, n = 11) =>
 // Log express traffic to the console
 export const logger = (req: Request, _: unknown, next: Function) => (
   console.log(
-    `\x1b[2m${new Date().toISOString().replace(/.*T|Z/g, "")}\x1b[0m`,
-    `\x1b[33m${req.method}\x1b[0m`,
-    `\x1b[2m(${pad(req.headers["user-agent"] ?? "Unknown")})\x1b[0m`,
+    new Date().toISOString().replace(/.*T|Z/g, "").dim,
+    req.method.yellow,
+    `(${pad(req.headers["user-agent"] ?? "Unknown")})`.dim,
     `${req.headers["host"]?.split(":")[1]}`,
-    `\x1b[32m"${req.path}"\x1b[0m`
+    `"${req.path}"`.green
   ),
   next()
 )
+
+export const log = (...props: any) =>
+  console.log(new Date().toISOString().replace(/.*T|Z/g, "").dim, ...props)
 
 // Add CORS headers to express response
 export const cors = (_: unknown, res: Response, next: Function) => (

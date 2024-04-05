@@ -1,21 +1,29 @@
 {
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
-    "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
+    // Enable latest features
     "lib": ["ESNext", "DOM"],
+    "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
+    "jsx": "react",
+    "allowJs": true,
+    // Bundler mode
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
     "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
+    // Best practices
     "strict": true,
-    "target": "ESNext",
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    "forceConsistentCasingInFileNames": true,
     "jsxFactory": "React.createElement",
     "jsxFragmentFactory": "React.Fragment",
-    "typeRoots": ["./types", "./node_modules/@types", "./node_modules/bun-types"],
-    "verbatimModuleSyntax": true
+    "typeRoots": ["./types", "./node_modules/@types", "./node_modules/bun-types"]
   }
 }
