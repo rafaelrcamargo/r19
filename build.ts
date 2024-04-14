@@ -27,19 +27,19 @@ const server = await Bun.build({
   outdir: resolve("build", "app"),
   plugins: [
     {
-      name: "rsc-server",
+      name: "rsc-register",
       setup(build) {
         build.onLoad({ filter: /\.tsx?$/ }, async args => {
           const content = await Bun.file(args.path).text()
 
-          const directives = content.match(/(?:^|\n|;)("use (client|server)";?)/)
+          const directives = content.match(/(?:^|\n|;)"use (client|server)";?/)
           if (!directives) return { contents: content } // If there are no directives, we let it be bundled
 
           const { exports } = new Bun.Transpiler({ loader: "tsx" }).scan(content)
           if (exports.length === 0) return { contents: content } // If there are no exports, we also let it be bundled
 
           return {
-            contents: exports.map(e => createReference(e, args.path, directives[2])).join("\n")
+            contents: exports.map(e => createReference(e, args.path, directives[1])).join("\n")
           }
         })
       }

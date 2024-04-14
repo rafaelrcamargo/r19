@@ -14,42 +14,38 @@ express()
   .use(logger)
   .use(cors)
   .get("/*", async (req, res) => {
-    const { __RSC, ...props } = req.query // We will use the query as props for the page
-    let mod
+    let mod // A slot to hold the module
+
     try {
-      mod = (await import(resolve("build/app", `.${req.path}/page.js`))).default(props)
+      mod = (await import(resolve("build/app", `.${req.path}/page.js`))).default(req.query) // We will use the query as props for the page
     } catch {
       mod = "Not Found"
     }
+
     renderToPipeableStream(mod, moduleBaseURL).pipe(res)
   })
   .post("/*", bodyParser.text(), async (req, res) => {
-    const { search } = new URL(req.url, `http://${req.headers.host}`)
+    const actionReference = String(req.headers["rsa-reference"])
+    const actionOrigin = String(req.headers["rsa-origin"])
 
-    if (search.includes("__RSA")) {
-      const actionReference = String(req.headers["rsa-reference"])
-      const actionOrigin = String(req.headers["rsa-origin"])
-      const { __RSA, ...props } = req.query // We will use the query as props for the page
+    // Resolve the action
+    const [filepath, name] = actionReference.split("#")
+    const action = (await import(`.${resolve(filepath)}`))[name]
 
-      // Resolve the action
-      const [filepath, name] = actionReference.split("#")
-      const action = (await import(`.${resolve(filepath)}`))[name]
-
-      let args // Decode the arguments
-      if (req.is("multipart/form-data")) {
-        // Use busboy to streamingly parse the reply from form-data.
-        const bb = busboy({ headers: req.headers })
-        const reply = decodeReplyFromBusboy(bb, resolve("build/") + "/")
-        req.pipe(bb)
-        args = await reply
-      } else {
-        args = await decodeReply(req.body, moduleBaseURL)
-      }
-
-      const returnValue = await action.apply(null, args) // Call the action
-
-      const root = (await import(resolve("build/app", `.${actionOrigin}/page.js`))).default(props)
-      renderToPipeableStream({ returnValue, root }, moduleBaseURL).pipe(res) // Render the app with the RSC, action result and the new root
+    let args // Decode the arguments
+    if (req.is("multipart/form-data")) {
+      // Use busboy to streamingly parse the reply from form-data.
+      const bb = busboy({ headers: req.headers })
+      const reply = decodeReplyFromBusboy(bb, resolve("build/") + "/")
+      req.pipe(bb)
+      args = await reply
+    } else {
+      args = await decodeReply(req.body, moduleBaseURL)
     }
+
+    const returnValue = await action.apply(null, args) // Call the action
+
+    const root = (await import(resolve("build/app", `.${actionOrigin}/page.js`))).default(req.query) // We will use the query as props for the page
+    renderToPipeableStream({ returnValue, root }, moduleBaseURL).pipe(res) // Render the app with the RSC, action result and the new root
   })
   .listen(port)

@@ -29,9 +29,8 @@ express()
         log("File not found, falling back to SSR".dim)
       }
     }
-    url.searchParams.set("__RSC", "true") // Let's re-use the url and forward to the API
 
-    return http.get(url.toString(), async rsc => {
+    return http.get(url, async rsc => {
       let Root = () => use(createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL)) // Create a root component from the RSC result
       const Layout = (await import(resolve("build/_layout"))).default // Load a HTML shell layout
 

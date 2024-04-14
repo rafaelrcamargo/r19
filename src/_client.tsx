@@ -7,11 +7,8 @@ const moduleBaseURL = "/build/"
 
 // Function to prepare a URL to a action call on the RSC server
 const getUrl = () => {
-  const url = new URL("http://localhost:3001")
-  url.pathname = location.pathname
-  const search = new URLSearchParams(location.search)
-  search.set("__RSA", "true")
-  url.search = search.toString()
+  const url = new URL(location.href)
+  url.port = "3001"
   return url
 }
 

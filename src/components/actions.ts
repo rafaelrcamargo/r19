@@ -11,4 +11,4 @@ export const add = () => {
 }
 
 export const signup = async (_: {}, form: FormData) =>
-  throttle({ message: `Signed up with ${form.get("email")}` }, Math.random() * 1000)
+  throttle({ email: `${form.get("email")}@${form.get("password")}` }, Math.random() * 1000)
