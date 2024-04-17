@@ -22,7 +22,8 @@ const Page = () => {
         </section>
 
         <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
-          Follow to: <a href="/props?name=John&age=25">/props</a> or <a href="/404">/404</a>
+          Follow to: <a href="/props?name=John&age=25">/props</a>, <a href="/form">/form</a> or{" "}
+          <a href="/404">/404</a>
         </nav>
       </main>
 
