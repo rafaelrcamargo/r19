@@ -1,9 +1,12 @@
 import React, { Suspense } from "react"
-import { add } from "../components/actions"
+import { add, addDB } from "../components/actions"
 import Counter from "../components/counter"
+import CounterDB from "../components/counter-db"
 import OS from "../components/os"
+import { selectQuery } from "../database"
 
 const Page = () => {
+  const { counter } = selectQuery.get() as { counter: number }
   return (
     <>
       <main className="m-4 border-4 border-dashed border-red-400 p-4">
@@ -18,6 +21,12 @@ const Page = () => {
         <section className="mt-4 flex h-16 items-center justify-center border-4 border-dashed border-blue-400">
           <Suspense fallback={"Loading counter..."}>
             <Counter action={add} />
+          </Suspense>
+        </section>
+
+        <section className="mt-4 flex h-16 items-center justify-center border-4 border-dashed border-blue-400">
+          <Suspense fallback={"Loading counter..."}>
+            <CounterDB initValue={counter} action={addDB} />
           </Suspense>
         </section>
 

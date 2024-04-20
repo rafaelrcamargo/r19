@@ -53,6 +53,7 @@ const client = await Bun.build({
   target: "bun",
   external: ["react", "react-dom", "react-server-dom-esm"],
   entrypoints: entries["components"],
+  root: resolve("src"),
   outdir: resolve("build")
 })
 log("Successful build?".dim, client.success)
