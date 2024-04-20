@@ -1,5 +1,6 @@
 "use server"
-import {selectQuery,updateQuery} from '../database'
+
+import { selectQuery, updateQuery } from "../database"
 
 // Artificial delay to simulate a heavier computation
 const throttle = (result: any, ms: number) =>
@@ -19,7 +20,7 @@ export const getDBCounter = () => {
 export const addDB = () => {
   updateQuery.run()
   const { counter } = selectQuery.get() as { counter: number }
-  console.log('DB counter:',counter)
+  console.log("DB counter:", counter)
   return counter
 }
 

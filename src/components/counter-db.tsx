@@ -2,10 +2,9 @@
 
 import React, { useState, useTransition } from "react"
 
-export default ({ initValue, action }: { initValue: number, action: () => number }) => {
+export default ({ initValue, action }: { initValue: number; action: () => number }) => {
   const [isPending, startTransition] = useTransition()
   const [count, setCount] = useState(initValue)
-
 
   const handleAction = () =>
     // @ts-expect-error - async functions should be expected
@@ -13,7 +12,6 @@ export default ({ initValue, action }: { initValue: number, action: () => number
 
   return (
     <>
-
       <button
         disabled={isPending}
         onClick={handleAction}
@@ -23,7 +21,6 @@ export default ({ initValue, action }: { initValue: number, action: () => number
           (Server action with persistent state in sqlite db)
         </small>
       </button>
-
     </>
   )
 }

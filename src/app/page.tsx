@@ -2,8 +2,8 @@ import React, { Suspense } from "react"
 import { add, addDB } from "../components/actions"
 import Counter from "../components/counter"
 import CounterDB from "../components/counter-db"
-import { selectQuery } from '../database'
 import OS from "../components/os"
+import { selectQuery } from "../database"
 
 const Page = () => {
   const { counter } = selectQuery.get() as { counter: number }
