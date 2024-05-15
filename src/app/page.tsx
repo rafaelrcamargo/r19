@@ -1,9 +1,15 @@
 import React, { Suspense } from "react"
-import { add } from "../components/actions"
+import { update } from "../components/actions"
 import Counter from "../components/counter"
 import OS from "../components/os"
+import Toaster from "../components/toaster"
+import { db } from "../database"
 
 const Page = () => {
+  const { counter } = db.query(`SELECT value as counter FROM counter WHERE id = 1`).get() as {
+    counter: number
+  }
+
   return (
     <>
       <main className="m-4 border-4 border-dashed border-red-400 p-4">
@@ -17,7 +23,11 @@ const Page = () => {
 
         <section className="mt-4 flex h-16 items-center justify-center border-4 border-dashed border-blue-400">
           <Suspense fallback={"Loading counter..."}>
-            <Counter action={add} />
+            <Counter initValue={counter} action={update} />
+          </Suspense>
+
+          <Suspense fallback={"Loading toaster..."}>
+            <Toaster />
           </Suspense>
         </section>
 

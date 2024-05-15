@@ -38,10 +38,10 @@ express()
         bootstrapModules: ["/build/_client.js"],
         importMap: {
           imports: {
-            "react/jsx-dev-runtime": "https://esm.sh/react@canary/jsx-dev-runtime.js",
-            react: "https://esm.sh/react@canary",
-            "react-dom": "https://esm.sh/react-dom@canary",
-            "react-dom/": "https://esm.sh/react-dom@canary/",
+            "react/jsx-dev-runtime": "https://esm.sh/react@next/jsx-dev-runtime.js",
+            react: "https://esm.sh/react@next",
+            "react-dom": "https://esm.sh/react-dom@next",
+            "react-dom/": "https://esm.sh/react-dom@next/",
             "react-server-dom-esm/client":
               "/node_modules/react-server-dom-esm/esm/react-server-dom-esm-client.browser.development.js"
           }
