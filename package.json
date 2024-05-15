@@ -3,12 +3,12 @@
   "type": "module",
   "module": "index.ts",
   "scripts": {
-    "export": "bun export.ts",
     "build": "bun build.ts",
     "predev": "cp -r ../react/build/oss-experimental/* ./node_modules/",
     "dev": "bun run build && bunx concurrently \"bun dev:rsc\" \"bun dev:ssr\"",
     "dev:rsc": "bun --conditions='react-server' rsc.ts",
     "dev:ssr": "bun ssr.ts",
+    "export": "bun export.ts",
     "format": "prettier --ignore-unknown --write ."
   },
   "prettier": {
