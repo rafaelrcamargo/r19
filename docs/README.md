@@ -23,7 +23,7 @@ This has a lot of cool caveats, like using Bun for most of the internals and _(m
 
 - [x] Simple
   - A basic overview of the features
-- [ ] Advanced
+- [x] Advanced
   - A more complex system with a SQLite database
 
 ## Usage
