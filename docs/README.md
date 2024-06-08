@@ -28,21 +28,12 @@ This has a lot of cool caveats, like using Bun for most of the internals and _(m
 
 ## Usage
 
-This project uses `react-server-dom-esm` as the "plugin" to integrate with most of the React 19 features. But this package is not published yet, so you need to clone the `react` repo and build it yourself.
-
-```bash
-git clone https://github.com/facebook/react.git
-cd react
-yarn && yarn build
-```
-
-Then, the `predev` script will copy the necessary files to the `node_modules` folder. _(It expects the `react` repo to be in the same parent directory as this repo.)_
+This project uses `react-server-dom-esm` as the "plugin" to integrate with most of the React 19 features.
 
 With all the dependencies set up, you can run the project with:
 
 ```bash
-bun i
-bun dev
+bun i && bun dev
 ```
 
 ## License

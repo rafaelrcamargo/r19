@@ -4,7 +4,6 @@
   "module": "index.ts",
   "scripts": {
     "build": "bun build.ts",
-    "predev": "cp -r ../react/build/oss-experimental/* ./node_modules/",
     "dev": "bun run build && bunx concurrently \"bun dev:rsc\" \"bun dev:ssr\"",
     "dev:rsc": "bun --conditions='react-server' rsc.ts",
     "dev:ssr": "bun ssr.ts",
@@ -37,11 +36,14 @@
     "trailingComma": "none"
   },
   "dependencies": {
+    "@physis/react-server-dom-esm": "^19.0.0-rc-cc0e491-20240519",
     "@types/busboy": "^1.5.3",
     "busboy": "^1.6.0",
     "colors": "^1.4.0",
     "express": "^4.18.3",
     "highlight.js": "^11.9.0",
+    "react": "^19.0.0-rc-cc1ec60d0d-20240607",
+    "react-dom": "^19.0.0-rc-cc1ec60d0d-20240607",
     "sonner": "^1.4.3"
   },
   "devDependencies": {
