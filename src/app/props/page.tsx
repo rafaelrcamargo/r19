@@ -19,14 +19,10 @@ export const Page = async (props: unknown) => {
         {/* Here we load the imported CSS file, it will be bundled with the page */}
         <link rel="stylesheet" href={resolve("/build/app/props", styles)} />
         {/* Here we use the generated HTML to render the highlighting */}
-        <div
-          className="my-2 rounded-md bg-[#22272e] p-4 text-[#cdd9e5]"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <div className="my-2 rounded-md bg-[#22272e] p-4 text-[#cdd9e5]" dangerouslySetInnerHTML={{ __html: html }} />
 
         <small className="opacity-50">
-          This was rendered on the server, and no JS was sent to the client for the <i>(huge)</i> syntax
-          highlighting lib.
+          This was rendered on the server, and no JS was sent to the client for the <i>(huge)</i> syntax highlighting lib.
         </small>
       </section>
 

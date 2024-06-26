@@ -1,11 +1,7 @@
 import { readdir } from "fs/promises"
-import { resolve } from "path"
-import { createReference, log } from "./utils"
-import "colors"
+import { parse, relative, resolve } from "path"
 
-log("Cleaning build artifacts")
-log("Successful clean?".dim, (await Bun.$`rm -rf ./build/`).exitCode === 0)
-
+await Bun.$`rm -rf ./build/`
 const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
   (acc, file) => {
     const ext = file.match(/\..+$/)
@@ -18,9 +14,14 @@ const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
   },
   { pages: [], components: [], assets: [] } as Record<string, string[]>
 )
-
-log("Building the pages")
-const server = await Bun.build({
+export const createReference = (e: string, path: string, directive: string) => {
+  const id = `/${relative(".", path).replace("src", "build").replace(/\..+$/, ".js")}#${e}` // React uses this to identify the component
+  const mod = `${e === "default" ? parse(path).base.replace(/\..+$/, "") : ""}_${e}` // We create a unique name for the component export
+  return directive === "server"
+    ? `const ${mod}=()=>{throw new Error("This function is expected to only run on the server")};${mod}.$$typeof=Symbol.for("react.server.reference");${mod}.$$id="${id}";${mod}.$$bound=null;${e === "default" ? `export{${mod} as default}` : `export {${mod} as ${e}}`};`
+    : `${e === "default" ? "export default {" : `export const ${e} = {`}$$typeof:Symbol.for("react.client.reference"),$$id:"${id}",$$async:true};`
+}
+await Bun.build({
   target: "bun",
   entrypoints: entries["pages"],
   external: ["react", "react-dom"],
@@ -31,32 +32,21 @@ const server = await Bun.build({
       setup(build) {
         build.onLoad({ filter: /\.tsx?$/ }, async args => {
           const content = await Bun.file(args.path).text()
-
           const directives = content.match(/(?:^|\n|;)"use (client|server)";?/)
-          if (!directives) return { contents: content } // If there are no directives, we let it be bundled
-
+          if (!directives) return { contents: content }
           const { exports } = new Bun.Transpiler({ loader: "tsx" }).scan(content)
-          if (exports.length === 0) return { contents: content } // If there are no exports, we also let it be bundled
-
-          return {
-            contents: exports.map(e => createReference(e, args.path, directives[1])).join("\n")
-          }
+          if (exports.length === 0) return { contents: content }
+          return { contents: exports.map(e => createReference(e, args.path, directives[1])).join("\n") }
         })
       }
     }
   ]
 })
-log("Successful build?".dim, server.success)
-
-log("Building the components")
-const client = await Bun.build({
+await Bun.build({
   target: "bun",
   external: ["react", "react-dom", "@physis/react-server-dom-esm"],
   entrypoints: entries["components"],
   root: resolve("src"),
   outdir: resolve("build")
 })
-log("Successful build?".dim, client.success)
-
 entries["assets"].forEach(asset => Bun.write(asset.replace("src", "build"), Bun.file(asset)))
-log("Done! 🎉".bold)

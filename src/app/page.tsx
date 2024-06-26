@@ -32,21 +32,16 @@ const Page = () => {
         </section>
 
         <nav className="mt-4 [&_a]:text-blue-500 [&_a]:underline">
-          Follow to: <a href="/props?name=John&age=25">/props</a>, <a href="/form">/form</a> or{" "}
-          <a href="/404">/404</a>
+          Follow to: <a href="/props?name=John&age=25">/props</a>
         </nav>
       </main>
 
       <footer className="mx-4">
         <h2>Caption:</h2>
 
-        <small className="text-red-400">
-          * Server components = No bundle size increase, rendered on the server
-        </small>
+        <small className="text-red-400">* Server components = No bundle size increase, rendered on the server</small>
         <br />
-        <small className="text-blue-400">
-          * Client components = Includes a JS bundle, rendered on the client
-        </small>
+        <small className="text-blue-400">* Client components = Includes a JS bundle, rendered on the client</small>
       </footer>
     </>
   )

@@ -30,16 +30,13 @@
       "@ianvs/prettier-plugin-sort-imports",
       "prettier-plugin-tailwindcss"
     ],
-    "printWidth": 110,
+    "printWidth": 128,
     "semi": false,
     "singleQuote": false,
     "trailingComma": "none"
   },
   "dependencies": {
     "@physis/react-server-dom-esm": "^19.0.0-rc-cc0e491-20240519",
-    "@types/busboy": "^1.5.4",
-    "busboy": "^1.6.0",
-    "colors": "^1.4.0",
     "express": "^4.19.2",
     "highlight.js": "^11.9.0",
     "react": "^19.0.0-rc-fb9a90fa48-20240614",

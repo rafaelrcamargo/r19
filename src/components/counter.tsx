@@ -16,9 +16,7 @@ export default ({ initValue, action }: { initValue: number; action: () => number
       onClick={handleAction}
       className="relative h-14 w-full bg-blue-100 text-xl duration-150 hover:bg-blue-200 disabled:bg-red-100 disabled:opacity-50">
       {count}
-      <small className="absolute bottom-1 right-1 text-xs opacity-50">
-        (Server action w/ persistent state in SQLite)
-      </small>
+      <small className="absolute bottom-1 right-1 text-xs opacity-50">(Server action w/ persistent state in SQLite)</small>
     </button>
   )
 }
