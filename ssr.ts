@@ -2,7 +2,7 @@ import http from "http"
 import { resolve } from "path"
 import { createElement, use } from "react"
 import { renderToPipeableStream } from "react-dom/server.node"
-import { createFromNodeStream } from "react-server-dom-esm/client.node"
+import { createFromNodeStream } from "@physis/react-server-dom-esm/client.node"
 import express from "express"
 import { log, logger } from "./utils"
 
@@ -42,8 +42,8 @@ express()
             react: "https://esm.sh/react@next",
             "react-dom": "https://esm.sh/react-dom@next",
             "react-dom/": "https://esm.sh/react-dom@next/",
-            "react-server-dom-esm/client":
-              "/node_modules/react-server-dom-esm/esm/react-server-dom-esm-client.browser.development.js"
+            "@physis/react-server-dom-esm/client":
+              "/node_modules/@physis/react-server-dom-esm/esm/react-server-dom-esm-client.browser.development.js"
           }
         }
       }).pipe(res) // Render the the element as html and send it to the client
