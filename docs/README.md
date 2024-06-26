@@ -4,6 +4,18 @@ A React 19 "framework" **from scratch**.
 
 > The name was definitely not inspired by F1 cars. :))
 
+> [!IMPORTANT]
+>
+> This branch contains **horrible** code, this is probably toxic in some way and I wouldn't stay here for long. But this is the place where I store the `100 lines` version of this project. _(Used for entertainment purposes only)_
+>
+> ```bash
+> ❯ wc -l *.ts
+>     51 build.ts
+>     16 rsc.ts
+>     32 ssr.ts
+>     99 total
+> ```
+
 ## Features
 
 This has a lot of cool caveats, like using Bun for most of the internals and _(maybe)_ the first React 19 framework to implement ESM and not a bundler like Webpack to be bundled.
