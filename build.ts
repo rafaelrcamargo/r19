@@ -1,7 +1,7 @@
+import "colors"
 import { readdir } from "fs/promises"
 import { resolve } from "path"
 import { createReference, log } from "./utils"
-import "colors"
 
 log("Cleaning build artifacts")
 log("Successful clean?".dim, (await Bun.$`rm -rf ./build/`).exitCode === 0)

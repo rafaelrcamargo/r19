@@ -1,6 +1,6 @@
+import hljs from "highlight.js"
 import { resolve } from "path"
 import React from "react"
-import hljs from "highlight.js"
 // @ts-ignore
 import styles from "highlight.js/styles/github-dark.css"
 

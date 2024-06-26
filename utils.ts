@@ -1,6 +1,6 @@
-import { parse, relative } from "path"
-import type { Request, Response } from "express"
 import "colors"
+import type { Request, Response } from "express"
+import { parse, relative } from "path"
 
 // Create the reference for the "client component" / "server action"
 export const createReference = (e: string, path: string, directive: string) => {
