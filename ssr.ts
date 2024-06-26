@@ -19,7 +19,6 @@ express()
           bootstrapModules: ["/build/_client.js"],
           importMap: {
             imports: {
-              "react/jsx-dev-runtime": "https://esm.sh/react@next/jsx-dev-runtime.js",
               react: "https://esm.sh/react@next",
               "react-dom": "https://esm.sh/react-dom@next",
               "react-dom/": "https://esm.sh/react-dom@next/",

@@ -1,6 +1,14 @@
 import { readdir } from "fs/promises"
 import { parse, relative, resolve } from "path"
 
+export const createReference = (e: string, path: string, directive: string) => {
+  const id = `/${relative(".", path).replace("src", "build").replace(/\..+$/, ".js")}#${e}` // React uses this to identify the component
+  const mod = `${e === "default" ? parse(path).base.replace(/\..+$/, "") : ""}_${e}` // We create a unique name for the component export
+  return directive === "server"
+    ? `const ${mod}=()=>{throw new Error("This function is expected to only run on the server")};${mod}.$$typeof=Symbol.for("react.server.reference");${mod}.$$id="${id}";${mod}.$$bound=null;${e === "default" ? `export{${mod} as default}` : `export {${mod} as ${e}}`};`
+    : `${e === "default" ? "export default {" : `export const ${e} = {`}$$typeof:Symbol.for("react.client.reference"),$$id:"${id}",$$async:true};`
+}
+
 await Bun.$`rm -rf ./build/`
 const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
   (acc, file) => {
@@ -14,13 +22,7 @@ const entries = (await readdir(resolve("src"), { recursive: true })).reduce(
   },
   { pages: [], components: [], assets: [] } as Record<string, string[]>
 )
-export const createReference = (e: string, path: string, directive: string) => {
-  const id = `/${relative(".", path).replace("src", "build").replace(/\..+$/, ".js")}#${e}` // React uses this to identify the component
-  const mod = `${e === "default" ? parse(path).base.replace(/\..+$/, "") : ""}_${e}` // We create a unique name for the component export
-  return directive === "server"
-    ? `const ${mod}=()=>{throw new Error("This function is expected to only run on the server")};${mod}.$$typeof=Symbol.for("react.server.reference");${mod}.$$id="${id}";${mod}.$$bound=null;${e === "default" ? `export{${mod} as default}` : `export {${mod} as ${e}}`};`
-    : `${e === "default" ? "export default {" : `export const ${e} = {`}$$typeof:Symbol.for("react.client.reference"),$$id:"${id}",$$async:true};`
-}
+
 await Bun.build({
   target: "bun",
   entrypoints: entries["pages"],
@@ -29,7 +31,7 @@ await Bun.build({
   plugins: [
     {
       name: "rsc-register",
-      setup(build) {
+      setup: build =>
         build.onLoad({ filter: /\.tsx?$/ }, async args => {
           const content = await Bun.file(args.path).text()
           const directives = content.match(/(?:^|\n|;)"use (client|server)";?/)
@@ -38,7 +40,6 @@ await Bun.build({
           if (exports.length === 0) return { contents: content }
           return { contents: exports.map(e => createReference(e, args.path, directives[1])).join("\n") }
         })
-      }
     }
   ]
 })
