@@ -20,7 +20,7 @@ express()
     const url = new URL(req.url, `http://${req.headers.host}`)
 
     url.port = "3001" // Forward to the SSR API server
-    if (url.searchParams.length === 0) {
+    if (url.searchParams.size === 0) {
       const page = (req.path === "/" ? "index" : req.path.slice(1)) + ".html"
       log("Defaulting to static page:", `"${page}"`.green)
       try {

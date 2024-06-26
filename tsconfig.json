@@ -18,7 +18,8 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
-    "typeRoots": ["./types", "./node_modules/@types", "./node_modules/bun-types"],
+    "types": ["node", "bun"],
+    "typeRoots": ["node_modules/@types", "node_modules/bun-types"],
     "verbatimModuleSyntax": true
   }
 }

@@ -25,7 +25,7 @@ export default () => {
 
       <button
         onClick={choose}
-        className="relative  h-14 w-full border-l-4 border-dashed border-blue-400 bg-blue-100 text-xl hover:bg-blue-200">
+        className="relative h-14 w-full border-l-4 border-dashed border-blue-400 bg-blue-100 text-xl hover:bg-blue-200">
         Toast! <small className="absolute bottom-1 right-1 text-xs opacity-50">(Client lib.)</small>
       </button>
     </>

@@ -1,9 +1,8 @@
-import { resolve } from "path";
-import React from "react";
-import hljs from "highlight.js";
+import { resolve } from "path"
+import React from "react"
+import hljs from "highlight.js"
 // @ts-ignore
-import styles from "highlight.js/styles/github-dark.css";
-
+import styles from "highlight.js/styles/github-dark.css"
 
 export const Page = async (props: unknown) => {
   const html = hljs.highlightAuto(JSON.stringify(props)).value
