@@ -11,8 +11,9 @@ export const update = async () =>
   ).counter
 
 // Artificial delay to simulate a heavier computation
-const throttle = <T>(result: T, ms: number) =>
-  new Promise<T>(resolve => setTimeout(() => resolve(result), ms))
+function throttle<T>(result: T, ms: number) {
+  return new Promise<T>(resolve => setTimeout(() => resolve(result), ms))
+}
 
 export const signup = async (_: {}, form: FormData): Promise<{ user: string }> =>
   throttle({ user: `${form.get("email")}@${form.get("password")}` }, Math.random() * 10000)

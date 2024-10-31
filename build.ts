@@ -46,7 +46,11 @@ const server = await Bun.build({
     }
   ]
 })
-log("Successful build?".dim, server)
+log("Successful build?".dim, server.success)
+if (!server.success) {
+  log(server)
+  process.exit(1)
+}
 
 log("Building the components")
 const client = await Bun.build({
@@ -57,6 +61,10 @@ const client = await Bun.build({
   outdir: resolve("build")
 })
 log("Successful build?".dim, client.success)
+if (!client.success) {
+  log(client)
+  process.exit(1)
+}
 
 entries["assets"].forEach(asset => Bun.write(asset.replace("src", "build"), Bun.file(asset)))
 log("Done! 🎉".bold)
