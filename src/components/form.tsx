@@ -1,49 +1,45 @@
 "use client"
 
-import React, { type FC } from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import React, { useActionState, useTransition, type FC } from "react"
+import type { signup } from "./actions"
 
-const initialState = { email: "" }
+export const Form: FC<{ action: typeof signup }> = ({ action }) => {
+  const [state, formAction] = useActionState(action, { user: "" })
+  const [isPending, startTransition] = useTransition()
 
-export const Form: FC<{ action: Function }> = ({ action }) => {
-  const [state, formAction] = useFormState(action, initialState)
+  const handleAction = (data: FormData) => startTransition(async () => formAction(data))
 
   return (
     <>
-      <form className="flex flex-wrap gap-4" action={formAction}>
+      <form className="flex flex-wrap gap-4" action={handleAction}>
         <input
-          className="rounded-md border border-gray-300 p-2"
-          type="text"
+          type="email"
           name="email"
-          placeholder="Email"
+          disabled={isPending}
+          placeholder="Your best email..."
+          className="border-2 border-dashed border-gray-400 p-2 disabled:opacity-50"
         />
         <input
-          className="rounded-md border border-gray-300 p-2"
           type="password"
           name="password"
-          placeholder="Password"
+          disabled={isPending}
+          placeholder="A secure password..."
+          className="border-2 border-dashed border-gray-400 p-2 disabled:opacity-50"
         />
-        <Submit />
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="bg-blue-500 px-6 py-2 text-white disabled:opacity-50">
+          {isPending ? "Loading..." : "Sign up"}
+        </button>
       </form>
 
-      {state?.email && (
-        <p aria-live="polite" role="status" className="mt-4">
-          Signed up with: <b>{state?.email}</b>
+      {state?.user && (
+        <p className="mt-4">
+          Signed up with: <b>{state?.user}</b>
         </p>
       )}
     </>
-  )
-}
-
-const Submit = () => {
-  const { pending } = useFormStatus()
-
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-md bg-blue-500 px-6 py-2 text-white disabled:opacity-50">
-      Sign up
-    </button>
   )
 }

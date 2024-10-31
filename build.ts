@@ -46,7 +46,7 @@ const server = await Bun.build({
     }
   ]
 })
-log("Successful build?".dim, server.success)
+log("Successful build?".dim, server)
 
 log("Building the components")
 const client = await Bun.build({

@@ -28,10 +28,10 @@
     "@types/busboy": "^1.5.4",
     "busboy": "^1.6.0",
     "colors": "^1.4.0",
-    "express": "^4.19.2",
-    "highlight.js": "^11.9.0",
-    "react": "^19.0.0-rc-fb9a90fa48-20240614",
-    "react-dom": "^19.0.0-rc-fb9a90fa48-20240614",
+    "express": "^4.21.1",
+    "highlight.js": "^11.10.0",
+    "react": "19.0.0-beta-26f2496093-20240514",
+    "react-dom": "19.0.0-beta-26f2496093-20240514",
     "sonner": "^1.5.0"
   },
   "devDependencies": {
@@ -40,11 +40,12 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "prettier": "^3.3.2",
+    "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-tailwindcss": "^0.6.5"
+    "prettier-plugin-tailwindcss": "^0.6.8"
   },
   "peerDependencies": {
     "typescript": "^5.4.2"
-  }
+  },
+  "packageManager": "pnpm@9.12.3"
 }
