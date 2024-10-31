@@ -27,8 +27,10 @@
     "@types/busboy": "^1.5.4",
     "busboy": "^1.6.0",
     "colors": "^1.4.0",
+    "cva": "^1.0.0-beta.1",
     "express": "^4.21.1",
     "highlight.js": "^11.10.0",
+    "hono": "^4.6.8",
     "react": "19.0.0-beta-26f2496093-20240514",
     "react-dom": "19.0.0-beta-26f2496093-20240514",
     "sonner": "^1.5.0"

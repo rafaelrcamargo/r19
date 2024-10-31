@@ -2,7 +2,7 @@ import { createFromNodeStream } from "@physis/react-server-dom-esm/client.node"
 import express from "express"
 import http from "http"
 import { resolve } from "path"
-import { createElement, use } from "react"
+import { createElement, use, type FunctionComponent } from "react"
 import { renderToPipeableStream } from "react-dom/server.node"
 import { log, logger } from "./utils"
 
@@ -31,7 +31,8 @@ express()
     }
 
     return http.get(url, async rsc => {
-      let Root = () => use(createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL)) // Create a root component from the RSC result
+      let Root: FunctionComponent<any> = () =>
+        use(createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL)) // Create a root component from the RSC result
       const Layout = (await import(resolve("build/_layout"))).default // Load a HTML shell layout
 
       renderToPipeableStream(createElement(Layout, { children: createElement(Root) }), {

@@ -17,20 +17,20 @@ export const Form: FC<{ action: typeof signup }> = ({ action }) => {
           name="email"
           disabled={isPending}
           placeholder="Your best email..."
-          className="border-2 border-dashed border-gray-400 bg-gray-100 p-2 disabled:opacity-50"
+          className="border-2 border-dashed border-gray-200 bg-gray-50 p-2 disabled:opacity-50"
         />
         <input
           type="password"
           name="password"
           disabled={isPending}
           placeholder="A secure password..."
-          className="border-2 border-dashed border-gray-400 bg-gray-100 p-2 disabled:opacity-50"
+          className="border-2 border-dashed border-gray-200 bg-gray-50 p-2 disabled:opacity-50"
         />
 
         <button
           type="submit"
           disabled={isPending}
-          className="relative h-14 w-full border-2 border-dashed border-blue-400 bg-blue-100 text-xl duration-150 hover:bg-blue-200 disabled:bg-red-100 disabled:opacity-50">
+          className="border-2 border-dashed border-green-300 bg-green-100 p-2 px-6 duration-150 hover:bg-green-200 disabled:border-red-300 disabled:bg-red-100 disabled:opacity-50">
           {isPending ? "Loading..." : "Sign up"}
         </button>
       </form>

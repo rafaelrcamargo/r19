@@ -1,7 +1,6 @@
 // Client
 declare module "@physis/react-server-dom-esm/client"
-declare module "@physis/react-server-dom-esm/server"
-declare module "react-dom"
+// declare module "react-dom"
 
 // RSC
 declare module "@physis/react-server-dom-esm/server.node"
