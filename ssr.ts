@@ -1,3 +1,4 @@
+import compression from "compression"
 import express from "express"
 import http from "http"
 import { resolve } from "path"
@@ -13,6 +14,7 @@ log(`Listening on http://localhost:${port}`)
 
 express()
   .use(logger)
+  .use(compression())
   .use("/build", express.static("build"))
   .use("/node_modules", express.static("node_modules"))
   .get(/\.(?!js).+$/, express.static("build"))
@@ -39,12 +41,11 @@ express()
         bootstrapModules: ["/build/_client.js"],
         importMap: {
           imports: {
-            "react/jsx-dev-runtime": "https://esm.sh/react@beta/jsx-dev-runtime.js",
             react: "https://esm.sh/react@beta",
             "react-dom": "https://esm.sh/react-dom@beta",
             "react-dom/": "https://esm.sh/react-dom@beta/",
             "react-server-dom-esm/client":
-              "/node_modules/react-server-dom-esm/esm/react-server-dom-esm-client.browser.development.js"
+              "/node_modules/react-server-dom-esm/esm/react-server-dom-esm-client.browser.production.js"
           }
         }
       }).pipe(res) // Render the the element as html and send it to the client
