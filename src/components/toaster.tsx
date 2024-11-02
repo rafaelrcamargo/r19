@@ -3,7 +3,7 @@
 import React from "react"
 import { toast, Toaster } from "sonner"
 
-export default () => {
+export const ShowToast = () => {
   const choose = () => {
     switch (Math.floor(Math.random() * 5) + 1) {
       case 1:
@@ -25,7 +25,7 @@ export default () => {
 
       <button
         onClick={choose}
-        className="relative h-14 w-full border-l-4 border-dashed border-blue-400 bg-blue-100 text-xl hover:bg-blue-200">
+        className="relative h-14 w-full border-l-4 border-dashed border-sky-400 bg-sky-100 text-xl hover:bg-sky-200">
         Toast! <small className="absolute bottom-1 right-1 text-xs opacity-50">(Client lib.)</small>
       </button>
     </>

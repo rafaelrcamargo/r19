@@ -1,6 +1,6 @@
-import { createFromFetch, encodeReply } from "@physis/react-server-dom-esm/client"
 import { createElement, use, type AwaitedReactNode, type FC, type Usable } from "react"
 import { hydrateRoot } from "react-dom/client"
+import { createFromFetch, encodeReply } from "react-server-dom-esm/client"
 
 // The *server* path of the modules
 const moduleBaseURL = "/build/"

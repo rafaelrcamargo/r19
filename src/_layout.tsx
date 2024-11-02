@@ -4,13 +4,23 @@ export default ({ children }: PropsWithChildren) => (
   <html>
     <head>
       <meta charSet="UTF-8" />
-      <title>RSC & RSA from scratch!</title>
-      {/* We only inline the Tailwind Script for the sake of the example */}
+      <title>R19 - A dead-simple React 19 "framework" implementation!</title>
+      {/* We only inline Tailwind for the sake of the example */}
       <script src="https://cdn.tailwindcss.com" />
     </head>
     <body>
-      {/* We could add any kind of shared UI here */}
-      <main id="root">{children}</main>
+      <main id="root" className="m-4 border-2 border-dashed border-neutral-300 p-4">
+        {children}
+      </main>
+
+      <div className="mt-4 flex w-full items-center justify-center gap-2 text-center text-xs text-neutral-400">
+        <a target="_blank" href="https://github.com/rafaelrcamargo/r19" className="underline">
+          GitHub
+        </a>
+        |<span>CMRG</span>
+        <span>©</span>
+        <time>2023</time>
+      </div>
     </body>
   </html>
 )

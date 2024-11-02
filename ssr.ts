@@ -1,9 +1,9 @@
-import { createFromNodeStream } from "@physis/react-server-dom-esm/client.node"
 import express from "express"
 import http from "http"
 import { resolve } from "path"
 import { createElement, use, type FunctionComponent } from "react"
 import { renderToPipeableStream } from "react-dom/server.node"
+import { createFromNodeStream } from "react-server-dom-esm/client.node"
 import { log, logger } from "./utils"
 
 const moduleBaseURL = "/build/"
@@ -16,7 +16,7 @@ express()
   .use("/build", express.static("build"))
   .use("/node_modules", express.static("node_modules"))
   .get(/\.(?!js).+$/, express.static("build"))
-  .get("/*", async (req, res) => {
+  .get(/.*/, async (req, res) => {
     const url = new URL(req.url, `http://${req.headers.host}`)
 
     url.port = "3001" // Forward to the SSR API server
@@ -24,13 +24,13 @@ express()
       const page = (req.path === "/" ? "index" : req.path.slice(1)) + ".html"
       log("Defaulting to static page:", `"${page}"`.green)
       try {
-        return res.send(await Bun.file(resolve("build/static/", "./" + page)).text())
+        return void res.send(await Bun.file(resolve("build/static/", "./" + page)).text())
       } catch {
         log("File not found, falling back to SSR".dim)
       }
     }
 
-    return http.get(url, async rsc => {
+    return void http.get(url, async rsc => {
       let Root: FunctionComponent<any> = () =>
         use(createFromNodeStream(rsc, resolve("build/") + "/", moduleBaseURL)) // Create a root component from the RSC result
       const Layout = (await import(resolve("build/_layout"))).default // Load a HTML shell layout
@@ -39,12 +39,12 @@ express()
         bootstrapModules: ["/build/_client.js"],
         importMap: {
           imports: {
-            "react/jsx-dev-runtime": "https://esm.sh/react@next/jsx-dev-runtime.js",
-            react: "https://esm.sh/react@next",
-            "react-dom": "https://esm.sh/react-dom@next",
-            "react-dom/": "https://esm.sh/react-dom@next/",
-            "@physis/react-server-dom-esm/client":
-              "/node_modules/@physis/react-server-dom-esm/esm/react-server-dom-esm-client.browser.development.js"
+            "react/jsx-dev-runtime": "https://esm.sh/react@beta/jsx-dev-runtime.js",
+            react: "https://esm.sh/react@beta",
+            "react-dom": "https://esm.sh/react-dom@beta",
+            "react-dom/": "https://esm.sh/react-dom@beta/",
+            "react-server-dom-esm/client":
+              "/node_modules/react-server-dom-esm/esm/react-server-dom-esm-client.browser.development.js"
           }
         }
       }).pipe(res) // Render the the element as html and send it to the client

@@ -3,7 +3,8 @@
 import React, { useActionState, useTransition, type FC } from "react"
 import type { signup } from "./actions"
 
-export const Form: FC<{ action: typeof signup }> = ({ action }) => {
+type Props = { action: typeof signup }
+export const Form: FC<Props> = ({ action }) => {
   const [state, formAction] = useActionState(action, { user: "" })
   const [isPending, startTransition] = useTransition()
 
@@ -30,7 +31,7 @@ export const Form: FC<{ action: typeof signup }> = ({ action }) => {
         <button
           type="submit"
           disabled={isPending}
-          className="border-2 border-dashed border-green-300 bg-green-100 p-2 px-6 duration-150 hover:bg-green-200 disabled:border-red-300 disabled:bg-red-100 disabled:opacity-50">
+          className="border-2 border-dashed border-green-300 bg-green-100 p-2 px-6 duration-150 hover:bg-green-200 disabled:border-rose-300 disabled:bg-rose-100 disabled:opacity-50">
           {isPending ? "Loading..." : "Sign up"}
         </button>
       </form>

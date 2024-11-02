@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState, useTransition } from "react"
+import React, { useState, useTransition, type FC } from "react"
 
-export default ({ initValue, action }: { initValue: number; action: () => Promise<number> }) => {
+type Props = { initialValue: number; action: () => Promise<number> }
+export const Counter: FC<Props> = ({ initialValue, action }) => {
   const [isPending, startTransition] = useTransition()
-  const [count, setCount] = useState(initValue)
+  const [count, setCount] = useState(initialValue)
 
   const handleAction = () => startTransition(async () => setCount(await action()))
 
@@ -12,7 +13,7 @@ export default ({ initValue, action }: { initValue: number; action: () => Promis
     <button
       disabled={isPending}
       onClick={handleAction}
-      className="relative h-14 w-full bg-blue-100 text-xl duration-150 hover:bg-blue-200 disabled:bg-red-100 disabled:opacity-50">
+      className="relative h-14 w-full bg-sky-100 text-xl duration-150 hover:bg-sky-200 disabled:bg-rose-100 disabled:opacity-50">
       {count}
 
       <small className="absolute bottom-1 right-1 text-xs opacity-50">

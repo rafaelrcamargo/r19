@@ -1,12 +1,8 @@
-import {
-  decodeReply,
-  decodeReplyFromBusboy,
-  renderToPipeableStream
-} from "@physis/react-server-dom-esm/server.node"
 import bodyParser from "body-parser"
 import busboy from "busboy"
 import express from "express"
 import { resolve } from "path"
+import { decodeReply, decodeReplyFromBusboy, renderToPipeableStream } from "react-server-dom-esm/server.node"
 import { cors, log, logger } from "./utils"
 
 const moduleBaseURL = "/build/"
@@ -17,7 +13,7 @@ log(`Listening on http://localhost:${port}`)
 express()
   .use(logger)
   .use(cors)
-  .get("/*", async (req, res) => {
+  .get(/.*/, async (req, res) => {
     let mod // A slot to hold the module
 
     try {
@@ -28,7 +24,7 @@ express()
 
     renderToPipeableStream(mod, moduleBaseURL).pipe(res)
   })
-  .post("/*", bodyParser.text(), async (req, res) => {
+  .post(/.*/, bodyParser.text(), async (req, res) => {
     const actionReference = String(req.headers["rsa-reference"])
     const actionOrigin = String(req.headers["rsa-origin"])
 
