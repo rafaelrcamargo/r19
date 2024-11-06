@@ -15,5 +15,5 @@ function throttle<T>(result: T, ms: number) {
   return new Promise<T>(resolve => setTimeout(() => resolve(result), ms))
 }
 
-export const signup = async (_: {}, form: FormData): Promise<{ user: string }> =>
+export const signup = async (form: FormData): Promise<{ user: string }> =>
   throttle({ user: `${form.get("email")}@${form.get("password")}` }, Math.random() * 5000)
