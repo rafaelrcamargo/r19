@@ -2,7 +2,7 @@ import "colors"
 import type { Request, Response } from "express"
 import { parse, relative } from "path"
 
-// Create the reference for the "client component" / "server action"
+// Create the reference for the "client component" / "server function"
 export const createReference = (e: string, path: string, directive: string) => {
   const id = `/${relative(".", path).replace("src", "build").replace(/\..+$/, ".js")}#${e}` // React uses this to identify the component
   const mod = `${e === "default" ? parse(path).base.replace(/\..+$/, "") : ""}_${e}` // We create a unique name for the component export

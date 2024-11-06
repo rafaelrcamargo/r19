@@ -44,7 +44,7 @@ export const Form: FC<Props> = ({ action }) => {
         ) : (
           isPending && (
             <>
-              Loading... <i>(This action is throttled, no worries)</i>
+              Loading... <i>(This function is throttled, no worries)</i>
             </>
           )
         )}

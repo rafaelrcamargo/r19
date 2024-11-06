@@ -28,7 +28,7 @@ express()
     const actionReference = String(req.headers["rsa-reference"])
     const actionOrigin = String(req.headers["rsa-origin"])
 
-    // Resolve the action
+    // Resolve the function
     const [filepath, name] = actionReference.split("#")
     const action = (await import(`.${resolve(filepath)}`))[name]
 
@@ -43,9 +43,9 @@ express()
       args = await decodeReply(req.body, moduleBaseURL)
     }
 
-    const returnValue = await action.apply(null, args) // Call the action
+    const returnValue = await action.apply(null, args) // Call the function
 
     const root = (await import(resolve("build/app", `.${actionOrigin}/page.js`))).default(req.query) // We will use the query as props for the page
-    renderToPipeableStream({ returnValue, root }, moduleBaseURL).pipe(res) // Render the app with the RSC, action result and the new root
+    renderToPipeableStream({ returnValue, root }, moduleBaseURL).pipe(res) // Render the app with the RSC, function result and the new root
   })
   .listen(port)

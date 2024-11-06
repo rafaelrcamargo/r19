@@ -5,14 +5,14 @@ import { createFromFetch, encodeReply } from "react-server-dom-esm/client"
 // The *server* path of the modules
 const moduleBaseURL = "/build/"
 
-// Function to prepare a URL to a action call on the RSC server
+// Function to prepare a URL to a function call on the RSC server
 const getUrl = () => {
   const url = new URL(location.href)
   url.port = "3001"
   return url
 }
 
-// This is the one that will handle the calls to resolve the actions
+// This is the one that will handle the calls to resolve the functions
 const callServer = async (id: string, args: unknown[]) =>
   (
     await createFromFetch(
@@ -21,7 +21,7 @@ const callServer = async (id: string, args: unknown[]) =>
         body: await encodeReply(args),
         headers: {
           "rsa-origin": location.pathname, // Tells the server where the call is coming from
-          "rsa-reference": id // Tells the server which action is being called
+          "rsa-reference": id // Tells the server which function is being called
         }
       }),
       { callServer, moduleBaseURL }

@@ -17,7 +17,7 @@ export const Counter: FC<Props> = ({ initialValue, action }) => {
       {count}
 
       <small className="absolute bottom-1 right-1 text-xs opacity-50">
-        (Server action w/ persistent state in SQLite)
+        (Server function w/ persistent state in SQLite)
       </small>
     </button>
   )
