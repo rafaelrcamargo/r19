@@ -16,7 +16,7 @@ This has a lot of cool caveats, like using Bun for most of the internals and _(m
 - [x] RSC (React Server Components)
 - [x] RSA (React Server Actions)
 - [x] SSR
-  - [x] Static export
+  - [x] Static export *(with `export const dynamic = "force-dynamic"` to opt-out)*
     - [x] Serve static files for default route states
 
 ## Examples
