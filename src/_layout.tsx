@@ -5,7 +5,7 @@ export default ({ children }: PropsWithChildren) => (
     <head>
       <meta charSet="UTF-8" />
       <title>R19 - A dead-simple React 19 "framework" implementation!</title>
-      {/* We only inline Tailwind for the sake of the example */}
+      {/* We only inline Tailwind for the sake of the example. */}
       <script src="https://cdn.tailwindcss.com" />
     </head>
     <body>
@@ -13,14 +13,14 @@ export default ({ children }: PropsWithChildren) => (
         {children}
       </main>
 
-      <div className="mt-4 flex w-full items-center justify-center gap-2 text-center text-xs text-neutral-400">
+      <footer className="mt-4 flex w-full items-center justify-center gap-2 text-center text-xs text-neutral-400">
         <a target="_blank" href="https://github.com/rafaelrcamargo/r19" className="underline">
           GitHub
         </a>
         |<span>CMRG</span>
         <span>©</span>
-        <time>2023</time>
-      </div>
+        <time>{new Date().getFullYear()}</time>
+      </footer>
     </body>
   </html>
 )

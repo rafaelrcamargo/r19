@@ -1,4 +1,4 @@
-import { createElement, use, type AwaitedReactNode, type FC, type Usable } from "react"
+import { createElement, use, type ReactNode, type Usable } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { createFromFetch, encodeReply } from "react-server-dom-esm/client"
 
@@ -32,7 +32,7 @@ const callServer = async (id: string, args: unknown[]) =>
 const data = createFromFetch(fetch(getUrl()), { callServer, moduleBaseURL })
 
 // This will transform the ReactNode stream into a ReactNode tree
-const Shell: FC<{ data: Usable<AwaitedReactNode> }> = ({ data }) => use(data)
+const Shell = ({ data }: { data: Usable<ReactNode> }) => use(data)
 
 // Finally this will then hydrate the page with the `Shell` component as the root
 hydrateRoot(document.getElementById("root")!, createElement(Shell, { data }))
